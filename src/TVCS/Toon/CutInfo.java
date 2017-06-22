@@ -10,8 +10,7 @@ public class CutInfo extends ObjectMetaInfo {
     public Rectangle rectangle;
     boolean deleted;
 
-    public CutInfo(String path, long id, Rectangle rectangle, boolean  deleted){
-        super(path);
+    public CutInfo(long id, Rectangle rectangle, boolean  deleted){
         this.id = id;
         this.rectangle = rectangle;
         this.deleted = deleted;

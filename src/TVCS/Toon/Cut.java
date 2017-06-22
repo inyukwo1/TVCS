@@ -13,24 +13,23 @@ import java.util.ArrayList;
  * Created by ina on 2017-06-02.
  */
 public class Cut implements Serializable{
-    transient Toon parent_toon;
-    transient String path;
+    transient Toon parentToon;
+    transient ToonScene parentScene;
 
     CutInfo cutInfo;
 
     public ArrayList<CutImage> images;
 
-    public Cut(Toon parent_toon, Rectangle rectangle, String path) {
-        this.parent_toon = parent_toon;
-        long id = parent_toon.GenerateID();
-        this.path = path + File.separator + id;
-        this.cutInfo = new CutInfo(this.path + File.separator + "cutinfo",
-                id , rectangle, false);
-        this.images = new ArrayList<CutImage>();
+    public Cut(Toon parentToon, ToonScene parentScene, Rectangle rectangle) {
+        this.parentToon = parentToon;
+        this.parentScene = parentScene;
+        long id = parentToon.GenerateID();
+        this.cutInfo = new CutInfo(id , rectangle, false);
+        this.images = new ArrayList<>();
     }
 
     public boolean AddImage(String image_path) {
-        CutImage new_image = new CutImage(parent_toon, path);
+        CutImage new_image = new CutImage(parentToon, parentScene, this);
         if(!new_image.LoadImage(image_path)) {
             return false;
         }
@@ -65,22 +64,21 @@ public class Cut implements Serializable{
     }
 
     public void Save() {
-        File cut_directory = new File(path);
-        if(cut_directory.exists()) {
-            FileManager.DeleteDirectory(cut_directory);
-        }
-        cut_directory.mkdir();
+        FileManager.MakeDirectory(cutDirPath());
         for(CutImage image : images) {
             image.Save();
         }
     }
-    public void Loadtransient(Toon parent_toon, String scene_path) {
-        this.parent_toon = parent_toon;
-        this.path = scene_path + File.separator + cutInfo.id;
-        cutInfo.Loadtransient(this.path + File.separator + "cutinfo");
+    public void Loadtransient(Toon parentToon, ToonScene parentScene) {
+        this.parentToon = parentToon;
+        this.parentScene = parentScene;
         for(CutImage image: images) {
-            image.Loadtransient(parent_toon, this.path);
+            image.Loadtransient(parentToon, parentScene, this);
         }
+    }
+
+    public String cutDirPath() {
+        return parentScene.sceneDirPath() + File.separator + cutInfo.id;
     }
 
 }

@@ -8,14 +8,12 @@ import java.util.ArrayList;
  */
 public class Branch implements Serializable{
     transient Toon parent_toon;
-    transient String path;
     transient ArrayList <BranchVertex> branchVertices;
 
     BranchVertex root;
 
     public Branch(Toon parent_toon) {
         this.parent_toon = parent_toon;
-        path = parent_toon.ToonPath() + File.separator + "branch";
         branchVertices = new ArrayList<>();
         MakeNewBranch();
     }
@@ -42,7 +40,7 @@ public class Branch implements Serializable{
 
     public void Save() {
         try {
-            FileOutputStream fileOutputStream = new FileOutputStream(path);
+            FileOutputStream fileOutputStream = new FileOutputStream(branchPath());
             BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(bufferedOutputStream);
 
@@ -55,7 +53,6 @@ public class Branch implements Serializable{
 
     public void Loadtransient(Toon parent_toon) {
         this.parent_toon = parent_toon;
-        this.path = parent_toon.ToonPath() + File.separator + "branch";
         this.branchVertices = new ArrayList<>();
         root.LoadtransientRecursively(this.parent_toon);
     }
@@ -71,5 +68,9 @@ public class Branch implements Serializable{
             }
         }
         return null;
+    }
+
+    public String branchPath() {
+        return parent_toon.toonPath() + File.separator + "branch";
     }
 }

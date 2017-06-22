@@ -10,8 +10,7 @@ public class SceneInfo extends ObjectMetaInfo{
     public String name;
     public long id;
     public int width, height;
-    public SceneInfo(String path, String name, long id, int width, int height) {
-        super(path);
+    public SceneInfo(String name, long id, int width, int height) {
         this.name = name;
         this.id = id;
         this.width = width;

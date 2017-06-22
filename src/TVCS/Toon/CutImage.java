@@ -11,19 +11,23 @@ import java.io.Serializable;
  * Created by ina on 2017-06-02.
  */
 public class CutImage implements Serializable{
-    transient Toon parent_toon;
-    public transient String path;
+    transient Toon parentToon;
+    transient ToonScene parentScene;
+    transient Cut parentCut;
+
     transient public BufferedImage image;
 
     CutImageInfo cutImageInfo;
 
 
-    public CutImage(Toon parent_toon, String path) {
-        this.parent_toon = parent_toon;
-        long id = parent_toon.GenerateID();
-        this.path = path + File.separator + id +".jpg";
-        cutImageInfo = new CutImageInfo(this.path + "info",
-                id, parent_toon.GenerateUpdateID());
+    public CutImage(Toon parentToon, ToonScene parentScene, Cut parentCut) {
+        this.parentToon = parentToon;
+        this.parentScene = parentScene;
+        this.parentCut = parentCut;
+
+
+        long id = parentToon.GenerateID();
+        cutImageInfo = new CutImageInfo(id, parentToon.GenerateUpdateID());
     }
     public boolean LoadImage(String image_path) {
         try {
@@ -35,15 +39,18 @@ public class CutImage implements Serializable{
         }
         return true;
     }
+
     public int Width() {
         return image.getWidth();
     }
+
     public int Height() {
         return image.getHeight();
     }
+
     public void Save() {
         try {
-            FileOutputStream fileOutputStream = new FileOutputStream(path);
+            FileOutputStream fileOutputStream = new FileOutputStream(cutImagePath());
             ImageIO.write(image, "JPG", fileOutputStream);
         } catch (IOException e) {
             e.printStackTrace();
@@ -54,10 +61,18 @@ public class CutImage implements Serializable{
         return cutImageInfo.id;
     }
 
-    public void Loadtransient(Toon parent_toon, String path) {
-        this.parent_toon = parent_toon;
-        this.path = path + File.separator + cutImageInfo.id;
-        LoadImage(this.path);
-        cutImageInfo.Loadtransient(this.path + "info");
+    public void Loadtransient(Toon parentToon, ToonScene parentScene, Cut parentCut) {
+        this.parentToon = parentToon;
+        this.parentScene = parentScene;
+        this.parentCut = parentCut;
+        LoadImage(cutImagePath());
+    }
+
+    public String cutImagePath() {
+        return parentCut.cutDirPath() + File.separator + cutImageInfo.id + ".jpg";
+    }
+
+    public String cutImageInfoPath() {
+        return cutImagePath() + "info";
     }
 }

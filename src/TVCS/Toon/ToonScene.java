@@ -14,7 +14,6 @@ import java.util.ArrayList;
  */
 public class ToonScene implements Serializable{
     transient Toon parent_toon;
-    transient String path;
 
     public SceneInfo sceneInfo;
 
@@ -23,9 +22,7 @@ public class ToonScene implements Serializable{
 
     public ToonScene(Toon parent_toon, String name, int width, int height) {
         this.parent_toon = parent_toon;
-        this.path = parent_toon.ToonPath() + File.separator + name;
-        this.sceneInfo = new SceneInfo(this.path + File.separator + "sceneinfo",
-                name, parent_toon.GenerateID(), width, height);
+        this.sceneInfo = new SceneInfo(name, parent_toon.GenerateID(), width, height);
         this.cuts = new ArrayList<Cut>();
     }
 
@@ -39,7 +36,7 @@ public class ToonScene implements Serializable{
         if(!ConfirmAddRect(new_cut_rect)){
             return null;
         }
-        Cut new_cut = new Cut(parent_toon, new_cut_rect, path);
+        Cut new_cut = new Cut(parent_toon, this, new_cut_rect);
         cuts.add(new_cut);
         return new_cut;
     }
@@ -61,15 +58,6 @@ public class ToonScene implements Serializable{
             System.out.println("File Making Failed");
         }
     }
-    private BufferedImage MergeScene(){
-        BufferedImage merged_scene = new BufferedImage(sceneInfo.width, sceneInfo.height, BufferedImage.TYPE_INT_RGB);
-        Graphics2D scene_graphics = (Graphics2D) merged_scene.getGraphics();
-        scene_graphics.setBackground(Color.WHITE); //TODO
-        for(Cut cut : cuts) {
-            cut.DrawLatestImage(scene_graphics);
-        }
-        return merged_scene;
-    }
 
     public long Id(){
         return sceneInfo.id;
@@ -84,12 +72,8 @@ public class ToonScene implements Serializable{
     }
 
     public void Save() {
-        File scene_directory = new File(path);
-        if(scene_directory.exists()) {
-            FileManager.DeleteDirectory(scene_directory);
-        }
-        scene_directory.mkdir();
-        FileManager.SaveSerializableObject(this, path + File.separator + sceneInfo.name);
+        FileManager.MakeDirectory(sceneDirPath());
+        FileManager.SaveSerializableObject(this, sceneInfoPath());
         for(Cut cut : cuts) {
             cut.Save();
         }
@@ -97,11 +81,8 @@ public class ToonScene implements Serializable{
 
     public void Loadtransient(Toon parent_toon) {
         this.parent_toon = parent_toon;
-        this.path = parent_toon.ToonPath() + File.separator + sceneInfo.name;
-        this.sceneInfo.Loadtransient(this.path + File.separator + "sceneinfo");
-
         for(Cut cut : cuts) {
-            cut.Loadtransient(parent_toon, this.path);
+            cut.Loadtransient(parent_toon, this);
         }
     }
 
@@ -115,5 +96,23 @@ public class ToonScene implements Serializable{
 
     public BranchVertex getBranchVertex() {
         return sceneInfo.branchVertex;
+    }
+
+    public String sceneDirPath() {
+        return parent_toon.toonPath() + File.separator + sceneInfo.name;
+    }
+
+    public String sceneInfoPath() {
+        return sceneDirPath() + File.separator + sceneInfo.name;
+    }
+
+    private BufferedImage MergeScene(){
+        BufferedImage merged_scene = new BufferedImage(sceneInfo.width, sceneInfo.height, BufferedImage.TYPE_INT_RGB);
+        Graphics2D scene_graphics = (Graphics2D) merged_scene.getGraphics();
+        scene_graphics.setBackground(Color.WHITE); //TODO
+        for(Cut cut : cuts) {
+            cut.DrawLatestImage(scene_graphics);
+        }
+        return merged_scene;
     }
 }

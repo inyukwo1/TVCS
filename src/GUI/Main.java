@@ -1,5 +1,6 @@
 package GUI;
 
+import TVCS.WorkSpace;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -16,9 +17,11 @@ public class Main extends Application {
     private Stage primaryStage;
     private BorderPane rootPane;
     private MenuManager menuManager;
+    public BranchManager branchManager = new BranchManager();
 
     @Override
     public void start(Stage primaryStage) throws Exception{
+        WorkSpace.mainApp = this;
         this.primaryStage = primaryStage;
         primaryStage.setTitle("ToonVCS");
         initRootLayout();
@@ -41,8 +44,9 @@ public class Main extends Application {
         rootPane.setTop(menuManager.getMenuBar());
     }
 
-
     public static void main(String[] args) {
         launch(args);
     }
+
+
 }

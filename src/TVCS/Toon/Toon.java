@@ -17,14 +17,17 @@ public class Toon {
     Branch branch;
     ArrayList<ToonScene> loaded_Toon_scenes;
 
-    public Toon(String path, boolean is_new) {
-        toon_path = path;
+    //used when create new toon
+    public Toon(String name) {
+        this.toon_path = "";
         loaded_Toon_scenes = new ArrayList<ToonScene>();
-        if(is_new) {
-            MakeNewToon();
-        } else {
-            LoadToon();
-        }
+        MakeNewToon();
+        this.toon_info.name = name;
+    }
+
+    //used when loading
+    public Toon() {
+        loaded_Toon_scenes = new ArrayList<ToonScene>();
     }
 
     public long GenerateID() {
@@ -36,29 +39,21 @@ public class Toon {
     }
 
     public boolean MakeNewToon(){
-        toon_info = new ToonInfo(toon_path + File.separator + "tooninfo");
-        File toon_directory = new File(toon_path);
-        if(toon_directory.exists()) {
-            FileManager.DeleteDirectory(toon_directory);
-        }
-        if(!toon_directory.mkdir()){
-            System.out.println("Making Failed");
-            return false;
-        }
+        toon_info = new ToonInfo();
         return MakeToonStructure();
     }
+
     private boolean MakeToonStructure() {
         branch = new Branch(this);
         return true;
     }
 
-    public String ToonPath() {
+    public String toonPath() {
         return toon_path;
     }
 
-
-
-    public boolean LoadToon() {
+    public boolean LoadToon(String path) {
+        this.toon_path = path;
         LoadToonInfo();
         LoadBranch();
         return true;
@@ -77,8 +72,8 @@ public class Toon {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        toon_info.Loadtransient(toon_info_path);
     }
+
     private void LoadBranch() {
         try {
             FileInputStream fileInputStream = new FileInputStream(toon_path + File.separator + "branch");
@@ -98,8 +93,10 @@ public class Toon {
         return branch;
     }
 
-    public boolean SaveToon() {
-        toon_info.Save();
+    public boolean SaveToon(String path) {
+        this.toon_path = path;
+        FileManager.MakeDirectory(toon_path);
+        toon_info.Save(toon_path + File.separator + "tooninfo");
         branch.Save();
         SaveScenes();
         return true;

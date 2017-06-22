@@ -64,6 +64,6 @@ public class ClientPushScene extends ClientBase{
     private void PushImage(CutImage image) throws IOException {
         data_output_stream.writeLong(image.id());
         System.out.println("Image id pushed");
-        FileManager.smallFilePush(image.path, output_stream);
+        FileManager.smallFilePush(image.cutImagePath(), output_stream);
     }
 }

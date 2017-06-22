@@ -6,8 +6,7 @@ package TVCS.Toon;
 public class CutImageInfo extends ObjectMetaInfo{
     public long id;
     public long update_id;
-    public CutImageInfo(String path, long id, long update_id) {
-        super(path);
+    public CutImageInfo(long id, long update_id) {
         this.id = id;
         this.update_id = update_id;
     }
