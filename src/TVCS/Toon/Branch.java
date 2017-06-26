@@ -18,7 +18,7 @@ public class Branch implements Serializable{
         MakeNewBranch();
     }
 
-    public BranchVertex AddNewVertex(ToonScene new_Toon_scene) {
+    public BranchVertex AddNewVertex(Episode new_Toon_scene) {
         BranchVertex new_vertex = new BranchVertex(parent_toon, new_Toon_scene);
         LoadToBranchVertices(new_vertex);
         root.AddEdgeTo(new_vertex);

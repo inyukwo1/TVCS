@@ -1,31 +1,26 @@
 package GUI;
 
+import TVCS.Toon.Episode;
 import TVCS.Toon.Toon;
 import TVCS.WorkSpace;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 
 /**
- * Created by ina on 2017-06-21.
+ * Created by ina on 2017-06-26.
  */
-public class MakeNewToon extends AskWithGridPane{
+public class MakeNewEpisode extends AskWithGridPane {
     TextField askNameTextField;
 
     @Override
     protected void setStageTitle() {
-        stage.setTitle("Make New Toon");
+        stage.setTitle("Make New Episode");
     }
 
     @Override
@@ -35,7 +30,7 @@ public class MakeNewToon extends AskWithGridPane{
     }
 
     private void addAskingToonName() {
-        Label askName = new Label("Toon Name: ");
+        Label askName = new Label("Episode Name: ");
         pane.add(askName, 0, 0);
         askNameTextField = new TextField();
         pane.add(askNameTextField, 1, 0);
@@ -46,8 +41,7 @@ public class MakeNewToon extends AskWithGridPane{
         okButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                WorkSpace.mainApp.stopToon();
-                WorkSpace.mainApp.initToon(new Toon(askNameTextField.getText()));
+                WorkSpace.mainApp.makeNewEpisode(askNameTextField.getText());
                 succeed = true;
                 stage.close();
             }

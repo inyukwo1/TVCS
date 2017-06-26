@@ -2,54 +2,51 @@ package TVCS.Client;
 
 import TVCS.Toon.Cut;
 import TVCS.Toon.CutImage;
-import TVCS.Toon.Toon;
-import TVCS.Toon.ToonScene;
+import TVCS.Toon.Episode;
 import TVCS.Utils.FileManager;
 
-import javax.imageio.ImageIO;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
 /**
  * Created by ina on 2017-06-15.
  */
-public class ClientPushScene extends ClientBase{
+public class ClientPushEpisode extends ClientBase{
     int clientId;
-    ToonScene scene;
+    Episode episode;
 
-    public ClientPushScene(String ip, int port, int clientId, ToonScene scene) {
+    public ClientPushEpisode(String ip, int port, int clientId, Episode episode) {
         super(ip, port);
         this.clientId = clientId;
-        this.scene = scene;
+        this.episode = episode;
     }
 
     @Override
     public void run() throws IOException {
         SendCommunicationType();
         System.out.println("Communication type push sent");
-        PushScene();
-        System.out.println("Scene pushed");
+        PushEpisode();
+        System.out.println("Episode pushed");
     }
 
     private void SendCommunicationType() throws IOException {
         data_output_stream.writeUTF("PUSH");
         data_output_stream.writeInt(clientId);
-        data_output_stream.writeUTF("scene");
+        data_output_stream.writeUTF("episode");
     }
 
-    private void PushScene() throws IOException {
-        data_output_stream.writeUTF(scene.name());
-        PushSceneInfo();
-        data_output_stream.writeInt(scene.numCuts());
-        for(Cut cut : scene.cuts) {
+    private void PushEpisode() throws IOException {
+        data_output_stream.writeUTF(episode.name());
+        PushEpisodeInfo();
+        data_output_stream.writeInt(episode.numCuts());
+        for(Cut cut : episode.cuts) {
             PushCut(cut);
         }
     }
 
-    private void PushSceneInfo() throws IOException {
+    private void PushEpisodeInfo() throws IOException {
         ObjectOutputStream objectOutputStream = new ObjectOutputStream(data_output_stream);
-        objectOutputStream.writeObject(scene);
+        objectOutputStream.writeObject(episode);
         objectOutputStream.flush();
     }
 

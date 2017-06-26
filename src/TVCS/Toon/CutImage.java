@@ -12,7 +12,7 @@ import java.io.Serializable;
  */
 public class CutImage implements Serializable{
     transient Toon parentToon;
-    transient ToonScene parentScene;
+    transient Episode parentScene;
     transient Cut parentCut;
 
     transient public BufferedImage image;
@@ -20,7 +20,7 @@ public class CutImage implements Serializable{
     CutImageInfo cutImageInfo;
 
 
-    public CutImage(Toon parentToon, ToonScene parentScene, Cut parentCut) {
+    public CutImage(Toon parentToon, Episode parentScene, Cut parentCut) {
         this.parentToon = parentToon;
         this.parentScene = parentScene;
         this.parentCut = parentCut;
@@ -61,7 +61,7 @@ public class CutImage implements Serializable{
         return cutImageInfo.id;
     }
 
-    public void Loadtransient(Toon parentToon, ToonScene parentScene, Cut parentCut) {
+    public void Loadtransient(Toon parentToon, Episode parentScene, Cut parentCut) {
         this.parentToon = parentToon;
         this.parentScene = parentScene;
         this.parentCut = parentCut;

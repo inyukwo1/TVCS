@@ -14,13 +14,13 @@ import java.util.ArrayList;
  */
 public class Cut implements Serializable{
     transient Toon parentToon;
-    transient ToonScene parentScene;
+    transient Episode parentScene;
 
     CutInfo cutInfo;
 
     public ArrayList<CutImage> images;
 
-    public Cut(Toon parentToon, ToonScene parentScene, Rectangle rectangle) {
+    public Cut(Toon parentToon, Episode parentScene, Rectangle rectangle) {
         this.parentToon = parentToon;
         this.parentScene = parentScene;
         long id = parentToon.GenerateID();
@@ -69,7 +69,7 @@ public class Cut implements Serializable{
             image.Save();
         }
     }
-    public void Loadtransient(Toon parentToon, ToonScene parentScene) {
+    public void Loadtransient(Toon parentToon, Episode parentScene) {
         this.parentToon = parentToon;
         this.parentScene = parentScene;
         for(CutImage image: images) {

@@ -1,12 +1,10 @@
 package TVCS.Server;
 
 import TVCS.Toon.Branch;
-import TVCS.Toon.ToonScene;
+import TVCS.Toon.Episode;
 import TVCS.Toon.ToonInfo;
 import TVCS.Utils.FileManager;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.Socket;
 
@@ -115,7 +113,7 @@ public class ServerWorker implements Runnable {
             ToonInfoPushCommunicate(toonId);
         } else if (pushType.equals("branch")) {
             BranchPushCommunicate(toonId);
-        } else if (pushType.equals("scene")) {
+        } else if (pushType.equals("episode")) {
             ScenePushCommunicate(toonId);
         } else {
             System.out.println("Wrong communication!");
@@ -159,8 +157,8 @@ public class ServerWorker implements Runnable {
     private void SceneInfoPushCommunicate(String sceneInfoPath) throws IOException{
         ObjectInputStream objectInputStream = new ObjectInputStream(data_input_stream);
         try {
-            ToonScene receivedToonScene = (ToonScene) objectInputStream.readObject();
-            FileManager.SaveSerializableObject(receivedToonScene, sceneInfoPath);
+            Episode receivedEpisode = (Episode) objectInputStream.readObject();
+            FileManager.SaveSerializableObject(receivedEpisode, sceneInfoPath);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }

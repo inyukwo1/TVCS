@@ -12,21 +12,21 @@ import java.util.ArrayList;
 /**
  * Created by ina on 2017-06-02.
  */
-public class ToonScene implements Serializable{
+public class Episode implements Serializable{
     transient Toon parent_toon;
 
-    public SceneInfo sceneInfo;
+    public EpisodeInfo episodeInfo;
 
     public ArrayList<Cut> cuts;
 
 
-    public ToonScene(Toon parent_toon, String name, int width, int height) {
+    public Episode(Toon parent_toon, String name, int width, int height) {
         this.parent_toon = parent_toon;
-        this.sceneInfo = new SceneInfo(name, parent_toon.GenerateID(), width, height);
+        this.episodeInfo = new EpisodeInfo(name, parent_toon.GenerateID(), width, height);
         this.cuts = new ArrayList<Cut>();
     }
 
-    public boolean MakeNewScene() {
+    public boolean MakeNewEpisode() {
         //TODO 이미 있는 scene인지 검사
         return true;
     }
@@ -60,11 +60,11 @@ public class ToonScene implements Serializable{
     }
 
     public long Id(){
-        return sceneInfo.id;
+        return episodeInfo.id;
     }
 
     public String name() {
-        return sceneInfo.name;
+        return episodeInfo.name;
     }
 
     public int numCuts() {
@@ -87,27 +87,27 @@ public class ToonScene implements Serializable{
     }
 
     public void LinkBranchVertex() {
-        sceneInfo.branchVertex = parent_toon.FindBranchVertex(sceneInfo.id);
+        episodeInfo.branchVertex = parent_toon.FindBranchVertex(episodeInfo.id);
     }
 
     public void LinkBranchVertex(BranchVertex branchVertex) {
-        sceneInfo.branchVertex = branchVertex;
+        episodeInfo.branchVertex = branchVertex;
     }
 
     public BranchVertex getBranchVertex() {
-        return sceneInfo.branchVertex;
+        return episodeInfo.branchVertex;
     }
 
     public String sceneDirPath() {
-        return parent_toon.toonPath() + File.separator + sceneInfo.name;
+        return parent_toon.toonPath() + File.separator + episodeInfo.name;
     }
 
     public String sceneInfoPath() {
-        return sceneDirPath() + File.separator + sceneInfo.name;
+        return sceneDirPath() + File.separator + episodeInfo.name;
     }
 
     private BufferedImage MergeScene(){
-        BufferedImage merged_scene = new BufferedImage(sceneInfo.width, sceneInfo.height, BufferedImage.TYPE_INT_RGB);
+        BufferedImage merged_scene = new BufferedImage(episodeInfo.width, episodeInfo.height, BufferedImage.TYPE_INT_RGB);
         Graphics2D scene_graphics = (Graphics2D) merged_scene.getGraphics();
         scene_graphics.setBackground(Color.WHITE); //TODO
         for(Cut cut : cuts) {

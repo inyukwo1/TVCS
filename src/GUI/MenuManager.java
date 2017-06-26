@@ -57,7 +57,9 @@ class MenuManager {
             @Override
             public void handle(ActionEvent event) {
                 MakeNewToon makeNewToon = new MakeNewToon();
-                makeNewToon.start();
+                if(makeNewToon.start() == true) {
+                    afterToonLoad();
+                }
             }
         });
     }

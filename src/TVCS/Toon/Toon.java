@@ -1,7 +1,7 @@
 package TVCS.Toon;
 
 import TVCS.Client.ClientAllocToon;
-import TVCS.Client.ClientPushScene;
+import TVCS.Client.ClientPushEpisode;
 import TVCS.Utils.FileManager;
 
 import java.io.*;
@@ -15,19 +15,19 @@ public class Toon {
 
     public ToonInfo toon_info;
     Branch branch;
-    ArrayList<ToonScene> loaded_Toon_scenes;
+    ArrayList<Episode> loadedEplisodes;
 
     //used when create new toon
     public Toon(String name) {
         this.toon_path = "";
-        loaded_Toon_scenes = new ArrayList<ToonScene>();
+        loadedEplisodes = new ArrayList<Episode>();
         MakeNewToon();
         this.toon_info.name = name;
     }
 
     //used when loading
     public Toon() {
-        loaded_Toon_scenes = new ArrayList<ToonScene>();
+        loadedEplisodes = new ArrayList<Episode>();
     }
 
     public long GenerateID() {
@@ -50,6 +50,10 @@ public class Toon {
 
     public String toonPath() {
         return toon_path;
+    }
+
+    public String name() {
+        return toon_info.name;
     }
 
     public boolean LoadToon(String path) {
@@ -98,44 +102,44 @@ public class Toon {
         FileManager.MakeDirectory(toon_path);
         toon_info.Save(toon_path + File.separator + "tooninfo");
         branch.Save();
-        SaveScenes();
+        SaveEpisodes();
         return true;
     }
 
-    private void SaveScenes() {
-        for (ToonScene toonScene : loaded_Toon_scenes) {
-            toonScene.Save();
+    private void SaveEpisodes() {
+        for (Episode episode : loadedEplisodes) {
+            episode.Save();
         }
     }
 
-    public ToonScene AddNewScene(String name, int width, int height) {
-        ToonScene newToonScene = new ToonScene(this, name, width, height);
-        if(!newToonScene.MakeNewScene()){
-            System.out.println("Making new scene failed");
+    public Episode AddNewEpisode(String name, int width, int height) {
+        Episode newEpisode = new Episode(this, name, width, height);
+        if(!newEpisode.MakeNewEpisode()){
+            System.out.println("Making new episode failed");
             return null;
         }
-        loaded_Toon_scenes.add(newToonScene);
-        BranchVertex newVertex = branch.AddNewVertex(newToonScene);
-        newToonScene.LinkBranchVertex(newVertex);
-        return newToonScene;
+        loadedEplisodes.add(newEpisode);
+        BranchVertex newVertex = branch.AddNewVertex(newEpisode);
+        newEpisode.LinkBranchVertex(newVertex);
+        return newEpisode;
     }
 
-    public ToonScene LoadScene(String scene_name) {
-        ToonScene toonScene = null;
+    public Episode LoadEpisode(String episodeName) {
+        Episode episode = null;
         try {
-            FileInputStream fileInputStream = new FileInputStream(toon_path + File.separator + scene_name + File.separator + scene_name);
+            FileInputStream fileInputStream = new FileInputStream(toon_path + File.separator + episodeName + File.separator + episodeName);
             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-            toonScene = (ToonScene) objectInputStream.readObject();
-            loaded_Toon_scenes.add(toonScene);
+            episode = (Episode) objectInputStream.readObject();
+            loadedEplisodes.add(episode);
             fileInputStream.close();
         } catch (IOException e) {
             System.out.println("File couldn't be read");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        toonScene.Loadtransient(this);
-        toonScene.LinkBranchVertex();
-        return toonScene;
+        episode.Loadtransient(this);
+        episode.LinkBranchVertex();
+        return episode;
     }
 
     public void LoadToBranchVertices(BranchVertex branchVertex) {
@@ -152,10 +156,10 @@ public class Toon {
         return toon_info.toonId = clientAllocToon.getId();
     }
 
-    public void PushScenes(String ip, int port) {
-        for(ToonScene scene : loaded_Toon_scenes) {
-            ClientPushScene clientPushScene = new ClientPushScene(ip, port, toon_info.toonId, scene);
-            clientPushScene.ClientStart();
+    public void PushEpisodes(String ip, int port) {
+        for(Episode episode : loadedEplisodes) {
+            ClientPushEpisode clientPushEpisode = new ClientPushEpisode(ip, port, toon_info.toonId, episode);
+            clientPushEpisode.ClientStart();
         }
     }
 }

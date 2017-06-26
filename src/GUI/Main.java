@@ -1,13 +1,15 @@
 package GUI;
 
+import TVCS.Toon.Toon;
 import TVCS.WorkSpace;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -17,7 +19,7 @@ public class Main extends Application {
     private Stage primaryStage;
     private BorderPane rootPane;
     private MenuManager menuManager;
-    public BranchManager branchManager = new BranchManager();
+    public ToonManager toonManager = null;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -42,6 +44,21 @@ public class Main extends Application {
         menuManager = new MenuManager();
         menuManager.constructMenuBar();
         rootPane.setTop(menuManager.getMenuBar());
+    }
+
+    public void stopToon() {
+        if(toonManager != null) {
+            toonManager.stop(rootPane);
+        }
+    }
+
+    public void initToon(Toon toon) {
+        toonManager = new ToonManager(toon);
+        toonManager.start(rootPane);
+    }
+
+    public void makeNewEpisode(String episodeName) {
+        toonManager.makeNewEpisode(episodeName);
     }
 
     public static void main(String[] args) {
