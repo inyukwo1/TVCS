@@ -67,6 +67,14 @@ public class Episode implements Serializable{
         return episodeInfo.name;
     }
 
+    public int getWidth() {
+        return episodeInfo.width;
+    }
+
+    public int getHeight() {
+        return episodeInfo.height;
+    }
+
     public int numCuts() {
         return cuts.size();
     }

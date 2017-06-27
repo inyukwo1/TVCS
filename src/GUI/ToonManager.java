@@ -8,6 +8,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -28,12 +29,15 @@ public class ToonManager {
     TabPane centerPane;
     GridPane rightPane;
 
+    Button addNewCutButton;
+
     int defaultWidth = 500;
     int defaultHeight = 3000;
 
     public ToonManager(Toon toon) {
         this.toon = toon;
         this.branchManager = new BranchManager(toon.getBranch());
+        this.addNewCutButton = makeAddNewCutButton();
     }
 
     public void stop(BorderPane rootPane) {
@@ -51,12 +55,15 @@ public class ToonManager {
         EpisodeManager newEpisodeManager = new EpisodeManager(newEpisode);
         newEpisodeManager.start(centerPane);
         episodeManagers.add(newEpisodeManager);
+        if(episodeManagers.size() == 1) {
+            rightPane.add(addNewCutButton, 0, 2);
+        }
     }
 
     private void fillBorderPane() {
         addTopPane();
         addRightPane();
-        addLeftPane();
+        addCenterPane();
     }
 
     private void addTopPane() {
@@ -98,7 +105,7 @@ public class ToonManager {
     }
 
     private Button makeNewSceneButton() {
-        Button newSceneButton = new Button("New Scene");
+        Button newSceneButton = new Button("New Episode");
         newSceneButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -109,7 +116,20 @@ public class ToonManager {
         return newSceneButton;
     }
 
-    private void addLeftPane() {
+    private Button makeAddNewCutButton() {
+        Button newSceneButton = new Button("Add New Cut");
+        newSceneButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                EpisodeTab selectedTab = (EpisodeTab) centerPane.getSelectionModel().getSelectedItem();
+                EpisodeManager selectedEpisodeManager = selectedTab.parentEpisodeManager;
+                selectedEpisodeManager.startAddCutMode();
+            }
+        });
+        return newSceneButton;
+    }
+
+    private void addCenterPane() {
         centerPane = new TabPane();
         centerPane.setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
         toonPane.setCenter(centerPane);
