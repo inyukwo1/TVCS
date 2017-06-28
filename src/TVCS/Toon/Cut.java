@@ -1,6 +1,7 @@
 package TVCS.Toon;
 
 import TVCS.Utils.FileManager;
+import TVCS.Utils.ToonPoint;
 import TVCS.Utils.Rectangle;
 
 import java.awt.*;
@@ -26,6 +27,14 @@ public class Cut implements Serializable{
         long id = parentToon.GenerateID();
         this.cutInfo = new CutInfo(id , rectangle, false);
         this.images = new ArrayList<>();
+    }
+
+    public void moveRectangle(Rectangle rectangle) {
+        cutInfo.rectangle = rectangle;
+    }
+
+    public ToonPoint cutPoint() {
+        return cutInfo.rectangle.LeftTopCoord();
     }
 
     public boolean AddImage(String image_path) {
@@ -69,6 +78,7 @@ public class Cut implements Serializable{
             image.Save();
         }
     }
+
     public void Loadtransient(Toon parentToon, Episode parentScene) {
         this.parentToon = parentToon;
         this.parentScene = parentScene;
