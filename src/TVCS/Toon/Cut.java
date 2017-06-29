@@ -3,6 +3,8 @@ package TVCS.Toon;
 import TVCS.Utils.FileManager;
 import TVCS.Utils.ToonPoint;
 import TVCS.Utils.Rectangle;
+import javafx.scene.image.*;
+import javafx.scene.image.Image;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -91,4 +93,7 @@ public class Cut implements Serializable{
         return parentScene.sceneDirPath() + File.separator + cutInfo.id;
     }
 
+    public Image currentImage() {
+        return images.get(images.size() - 1).fxImage();
+    }
 }

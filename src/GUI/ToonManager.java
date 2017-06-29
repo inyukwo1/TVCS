@@ -131,7 +131,7 @@ public class ToonManager {
 
     private void addCenterPane() {
         centerPane = new TabPane();
-        centerPane.setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
+        centerPane.setBackground(new Background(new BackgroundFill(Color.DARKGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
         toonPane.setCenter(centerPane);
     }
 }

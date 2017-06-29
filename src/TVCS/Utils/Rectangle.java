@@ -7,19 +7,20 @@ import java.io.Serializable;
  */
 public class Rectangle implements Serializable {
     public ToonPoint coord;
-    public int width, height;
+    public double width;
+    public double height;
 
-    public Rectangle(int x, int y, int width, int height) {
+    public Rectangle(double x, double y, double width, double height) {
         this.coord = new ToonPoint(x, y);
         this.width = width;
         this.height = height;
     }
 
-    public int leftPos() {
+    public double leftPos() {
         return coord.x;
     }
 
-    public int topPos() {
+    public double topPos() {
         return coord.y;
     }
 
@@ -59,7 +60,7 @@ public class Rectangle implements Serializable {
         return false;
     }
 
-    public void set(int startX, int startY, int endX, int endY) {
+    public void set(double startX, double startY, double endX, double endY) {
         if (startX >= endX) {
             coord.x = endX;
             width = startX - endX;
@@ -76,7 +77,7 @@ public class Rectangle implements Serializable {
         }
     }
 
-    public void setEndPoint(int endX, int endY) {
+    public void setEndPoint(double endX, double endY) {
         if (endX >= coord.x && endY >= coord.y) {
             width = endX - coord.x;
             height = endY - coord.y;

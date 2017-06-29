@@ -53,7 +53,7 @@ public class EpisodeManager {
         dragHandler = makeDragHandler();
         pressHandler = makePressEventHandler();
         releaseHandler = makeReleaseHandler();
-        workPane.setOnMousePressed(pressHandler);
+        workPane.addEventHandler(MouseEvent.MOUSE_PRESSED, pressHandler);
     }
 
     private void constructTab() {
@@ -76,9 +76,9 @@ public class EpisodeManager {
             @Override
             public void handle(MouseEvent event) {
                 cutManagers.add(new CutManager(
-                        episode.AddNewCut((int) event.getX(), (int) event.getY(), 0, 0), workPane));
-                workPane.setOnMouseDragged(dragHandler);
-                workPane.setOnMouseReleased(releaseHandler);
+                        episode.AddNewCut(event.getX(), event.getY(), 0, 0), workPane));
+                workPane.addEventHandler(MouseEvent.MOUSE_DRAGGED, dragHandler);
+                workPane.addEventHandler(MouseEvent.MOUSE_RELEASED, releaseHandler);
             }
         };
     }
@@ -88,7 +88,7 @@ public class EpisodeManager {
             @Override
             public void handle(MouseEvent event) {
                 CutManager cutManager = cutManagers.get(cutManagers.size() - 1);
-                cutManager.moveEndPoint((int) event.getX(), (int) event.getY());
+                cutManager.moveEndPoint(event.getX(), event.getY());
             }
         };
     }

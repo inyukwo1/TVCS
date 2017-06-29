@@ -1,5 +1,8 @@
 package TVCS.Toon;
 
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.image.Image;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -74,5 +77,9 @@ public class CutImage implements Serializable{
 
     public String cutImageInfoPath() {
         return cutImagePath() + "info";
+    }
+
+    public Image fxImage() {
+        return SwingFXUtils.toFXImage(image, null);
     }
 }

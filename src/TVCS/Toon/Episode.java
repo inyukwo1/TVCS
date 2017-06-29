@@ -31,7 +31,7 @@ public class Episode implements Serializable{
         return true;
     }
 
-    public Cut AddNewCut(int x, int y, int width, int height) {
+    public Cut AddNewCut(double x, double y, int width, int height) {
         Rectangle new_cut_rect = new Rectangle(x, y, width, height);
         if(!ConfirmAddRect(new_cut_rect)){
             return null;
