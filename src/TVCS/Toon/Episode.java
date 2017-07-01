@@ -13,6 +13,8 @@ import java.util.ArrayList;
  * Created by ina on 2017-06-02.
  */
 public class Episode implements Serializable{
+    //TODO 최근 Push / Pull 후 변동사항이 있는가?
+    //TODO 최근 Save 이후로 변동사항이 있는가?
     transient Toon parent_toon;
 
     public EpisodeInfo episodeInfo;
@@ -112,6 +114,11 @@ public class Episode implements Serializable{
 
     public String sceneInfoPath() {
         return sceneDirPath() + File.separator + episodeInfo.name;
+    }
+
+    public boolean hasToSave() {
+        //TODO
+        return false;
     }
 
     private BufferedImage MergeScene(){

@@ -11,6 +11,7 @@ import java.util.ArrayList;
  * Created by ina on 2017-06-02.
  */
 public class Toon {
+    //TODO Push 하기 전에는 무조건 저장하고 Push가능.
     String toon_path;
 
     public ToonInfo toon_info;
@@ -99,6 +100,13 @@ public class Toon {
 
     public boolean SaveToon(String path) {
         this.toon_path = path;
+        return SaveToon();
+    }
+
+    public boolean SaveToon() {
+        if (this.toon_path.equals("")) {
+            return false;
+        }
         FileManager.MakeDirectory(toon_path);
         toon_info.Save(toon_path + File.separator + "tooninfo");
         branch.Save();
@@ -106,10 +114,11 @@ public class Toon {
         return true;
     }
 
-    private void SaveEpisodes() {
-        for (Episode episode : loadedEplisodes) {
-            episode.Save();
+    public boolean hasPath() {
+        if (toon_path.equals("")) {
+            return false;
         }
+        return true;
     }
 
     public Episode AddNewEpisode(String name, int width, int height) {
@@ -150,16 +159,44 @@ public class Toon {
         return branch.FindBranchVertex(id);
     }
 
+    public void pushAll(String ip, int port) {
+        if(pushedBefore()) {
+            PushAlloc(ip, port);
+        }
+        PushEpisodes(ip, port);
+    }
+
     public int PushAlloc(String ip, int port) {
         ClientAllocToon clientAllocToon = new ClientAllocToon(ip, port, this);
         clientAllocToon.ClientStart();
-        return toon_info.toonId = clientAllocToon.getId();
+        toon_info.toonId = clientAllocToon.getId();
+        toon_info.Save(toon_path + File.separator + "tooninfo");
+        return toon_info.toonId;
     }
 
     public void PushEpisodes(String ip, int port) {
         for(Episode episode : loadedEplisodes) {
-            ClientPushEpisode clientPushEpisode = new ClientPushEpisode(ip, port, toon_info.toonId, episode);
-            clientPushEpisode.ClientStart();
+            pushEpisode(ip, port, episode);
+        }
+    }
+
+    public void pushEpisode(String ip, int port, Episode episode) {
+        ClientPushEpisode clientPushEpisode = new ClientPushEpisode(ip, port, toon_info.toonId, episode);
+        clientPushEpisode.ClientStart();
+    }
+
+    public boolean pushedBefore() {
+        return toon_info.toonId != -1;
+    }
+
+    public boolean hasToSave() {
+        //TODO
+        return false;
+    }
+
+    private void SaveEpisodes() {
+        for (Episode episode : loadedEplisodes) {
+            episode.Save();
         }
     }
 }

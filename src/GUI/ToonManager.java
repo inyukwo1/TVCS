@@ -8,7 +8,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -23,6 +22,7 @@ public class ToonManager {
     Toon toon;
     BranchManager branchManager;
     ArrayList<EpisodeManager> episodeManagers = new ArrayList<>();
+    PushManager pushManager;
     BorderPane toonPane;
 
     StackPane topPane;
@@ -36,6 +36,7 @@ public class ToonManager {
 
     public ToonManager(Toon toon) {
         this.toon = toon;
+        this.pushManager = new PushManager(toon);
         this.branchManager = new BranchManager(toon.getBranch());
         this.addNewCutButton = makeAddNewCutButton();
     }
@@ -50,14 +51,31 @@ public class ToonManager {
         rootPane.setCenter(toonPane);
     }
 
+    public boolean saveToonAs(String toonPath) {
+        return toon.SaveToon(toonPath);
+    }
+
+    public boolean hasPath() {
+        return toon.hasPath();
+    }
+
+    public boolean saveToon() {
+        return toon.SaveToon();
+    }
+
     public void makeNewEpisode(String episodeName) {
         Episode newEpisode = toon.AddNewEpisode(episodeName, defaultWidth, defaultHeight);
         EpisodeManager newEpisodeManager = new EpisodeManager(newEpisode);
         newEpisodeManager.start(centerPane);
         episodeManagers.add(newEpisodeManager);
         if(episodeManagers.size() == 1) {
-            rightPane.add(addNewCutButton, 0, 2);
+            whenFirstEpisodeMade();
         }
+    }
+
+    public EpisodeManager selectedEpisodeManager() {
+        EpisodeTab selectedTab = (EpisodeTab) centerPane.getSelectionModel().getSelectedItem();
+        return selectedTab.parentEpisodeManager;
     }
 
     private void fillBorderPane() {
@@ -101,10 +119,13 @@ public class ToonManager {
 
     private void fillRightPane() {
         rightPane.add(branchManager.makeShowButton(), 0, 0);
-        rightPane.add(makeNewSceneButton(), 0, 1);
+        rightPane.add(pushManager.getPushAllButton(), 0, 1);
+
+        rightPane.add(makeNewEpisodeButton(), 0, 3);
+
     }
 
-    private Button makeNewSceneButton() {
+    private Button makeNewEpisodeButton() {
         Button newSceneButton = new Button("New Episode");
         newSceneButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -121,9 +142,7 @@ public class ToonManager {
         newSceneButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                EpisodeTab selectedTab = (EpisodeTab) centerPane.getSelectionModel().getSelectedItem();
-                EpisodeManager selectedEpisodeManager = selectedTab.parentEpisodeManager;
-                selectedEpisodeManager.startAddCutMode();
+                selectedEpisodeManager().startAddCutMode();
             }
         });
         return newSceneButton;
@@ -134,4 +153,10 @@ public class ToonManager {
         centerPane.setBackground(new Background(new BackgroundFill(Color.DARKGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
         toonPane.setCenter(centerPane);
     }
+
+    private void whenFirstEpisodeMade() {
+        rightPane.add(pushManager.getPushEpisodeButton(), 0, 2);
+        rightPane.add(addNewCutButton, 0, 4);
+    }
+    //TODO When there become no episode, we have to remove some buttons
 }

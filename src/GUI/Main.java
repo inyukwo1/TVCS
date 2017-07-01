@@ -24,6 +24,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         WorkSpace.mainApp = this;
+        WorkSpace.primaryStage = primaryStage;
         this.primaryStage = primaryStage;
         primaryStage.setTitle("ToonVCS");
         initRootLayout();
@@ -55,6 +56,16 @@ public class Main extends Application {
     public void initToon(Toon toon) {
         toonManager = new ToonManager(toon);
         toonManager.start(rootPane);
+    }
+
+    public boolean loadToon(String toonPath) {
+        Toon toon = new Toon();
+        if (toon.LoadToon(toonPath) == false) {
+            return false;
+        }
+        toonManager = new ToonManager(toon);
+        toonManager.start(rootPane);
+        return true;
     }
 
     public void makeNewEpisode(String episodeName) {
