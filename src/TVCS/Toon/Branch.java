@@ -24,6 +24,7 @@ public class Branch implements Serializable{
         root.AddEdgeTo(new_vertex);
         return new_vertex;
     }
+
     public void AddNewEdge(BranchVertex sourceVertex, BranchVertex targetVertex) {
         sourceVertex.AddEdgeTo(targetVertex);
         DeleteEdge(root, targetVertex);

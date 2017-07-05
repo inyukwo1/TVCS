@@ -1,7 +1,7 @@
 package TVCS;
 
 import GUI.Main;
-import TVCS.Toon.Toon;
+import Client.ClientBase;
 import javafx.stage.Stage;
 
 /**

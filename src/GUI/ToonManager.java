@@ -19,6 +19,7 @@ import java.util.ArrayList;
  */
 
 public class ToonManager {
+    //TODO rightpane align
     Toon toon;
     BranchManager branchManager;
     ArrayList<EpisodeManager> episodeManagers = new ArrayList<>();
@@ -119,9 +120,9 @@ public class ToonManager {
 
     private void fillRightPane() {
         rightPane.add(branchManager.makeShowButton(), 0, 0);
-        rightPane.add(pushManager.getPushAllButton(), 0, 1);
-
-        rightPane.add(makeNewEpisodeButton(), 0, 3);
+        rightPane.add(pushManager.getRegisterToonButton(), 0, 1);
+        rightPane.add(pushManager.getPushAllButton(), 0, 2);
+        rightPane.add(makeNewEpisodeButton(), 0, 4);
 
     }
 
@@ -155,8 +156,8 @@ public class ToonManager {
     }
 
     private void whenFirstEpisodeMade() {
-        rightPane.add(pushManager.getPushEpisodeButton(), 0, 2);
-        rightPane.add(addNewCutButton, 0, 4);
+        rightPane.add(pushManager.getPushEpisodeButton(), 0, 3);
+        rightPane.add(addNewCutButton, 0, 5);
     }
     //TODO When there become no episode, we have to remove some buttons
 }

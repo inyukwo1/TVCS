@@ -1,6 +1,6 @@
 package TVCS;
 
-import TVCS.Client.ClientBase;
+import Client.ClientBase;
 
 /**
  * Created by ina on 2017-05-31.

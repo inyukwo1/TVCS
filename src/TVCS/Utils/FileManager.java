@@ -22,6 +22,11 @@ public class FileManager {
         return path.delete();
     }
 
+    public static boolean PathExists(String path) {
+        File file = new File(path);
+        return file.exists();
+    }
+
     public static boolean DeleteDirectory(String path) {
         File directory = new File(path);
         return DeleteDirectory(directory);
@@ -102,12 +107,12 @@ public class FileManager {
 
     public static boolean writeBufferToFile(String path, byte[] buffer) {
         try {
-            FileOutputStream fileOutputStream = new FileOutputStream(path);
+            FileOutputStream fileOutputStream = new FileOutputStream(new File(path));
             BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
             bufferedOutputStream.write(buffer, 0, buffer.length);
             bufferedOutputStream.flush();
         } catch (FileNotFoundException e) {
-            System.out.println("File Not Found");
+            System.out.println("File Not Found: " + path);
             return false;
         } catch (IOException e) {
             e.printStackTrace();

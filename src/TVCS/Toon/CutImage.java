@@ -54,7 +54,7 @@ public class CutImage implements Serializable{
     public void Save() {
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(cutImagePath());
-            ImageIO.write(image, "JPG", fileOutputStream);
+            ImageIO.write(image, "PNG", fileOutputStream);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -72,7 +72,7 @@ public class CutImage implements Serializable{
     }
 
     public String cutImagePath() {
-        return parentCut.cutDirPath() + File.separator + cutImageInfo.id + ".jpg";
+        return parentCut.cutDirPath() + File.separator + cutImageInfo.id + ".png";
     }
 
     public String cutImageInfoPath() {

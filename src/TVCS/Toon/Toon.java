@@ -1,7 +1,6 @@
 package TVCS.Toon;
 
-import TVCS.Client.ClientAllocToon;
-import TVCS.Client.ClientPushEpisode;
+import GUI.GuiClientAuthorizer;
 import TVCS.Utils.FileManager;
 
 import java.io.*;
@@ -15,8 +14,8 @@ public class Toon {
     String toon_path;
 
     public ToonInfo toon_info;
-    Branch branch;
-    ArrayList<Episode> loadedEplisodes;
+    public Branch branch;
+    public ArrayList<Episode> loadedEplisodes;
 
     //used when create new toon
     public Toon(String name) {
@@ -55,6 +54,14 @@ public class Toon {
 
     public String name() {
         return toon_info.name;
+    }
+
+    public long toonId() {
+        return toon_info.toonId;
+    }
+
+    public void setToonId(long toonId) {
+        toon_info.toonId = toonId;
     }
 
     public boolean LoadToon(String path) {
@@ -159,39 +166,9 @@ public class Toon {
         return branch.FindBranchVertex(id);
     }
 
-    public void pushAll(String ip, int port) {
-        if(pushedBefore()) {
-            PushAlloc(ip, port);
-        }
-        PushEpisodes(ip, port);
-    }
-
-    public int PushAlloc(String ip, int port) {
-        ClientAllocToon clientAllocToon = new ClientAllocToon(ip, port, this);
-        clientAllocToon.ClientStart();
-        toon_info.toonId = clientAllocToon.getId();
-        toon_info.Save(toon_path + File.separator + "tooninfo");
-        return toon_info.toonId;
-    }
-
-    public void PushEpisodes(String ip, int port) {
-        for(Episode episode : loadedEplisodes) {
-            pushEpisode(ip, port, episode);
-        }
-    }
-
-    public void pushEpisode(String ip, int port, Episode episode) {
-        ClientPushEpisode clientPushEpisode = new ClientPushEpisode(ip, port, toon_info.toonId, episode);
-        clientPushEpisode.ClientStart();
-    }
-
-    public boolean pushedBefore() {
-        return toon_info.toonId != -1;
-    }
-
     public boolean hasToSave() {
         //TODO
-        return false;
+        return true;
     }
 
     private void SaveEpisodes() {

@@ -128,7 +128,7 @@ public class TestMain {
         new_cut.AddImage("C:\\Users\\Public\\Pictures\\Sample Pictures\\Chrysanthemum.jpg");
         new_toon.SaveToon("C:\\Users\\ina\\ToonTest");
 
-        new_toon.PushAlloc("localhost", 3000);
+        //new_toon.PushAlloc("localhost", 3000);
     }
 
     public static void ToonTestPush() {
@@ -145,8 +145,8 @@ public class TestMain {
         new_cut = new_Toon_scene2.AddNewCut(10, 700, 100, 100);
         new_cut.AddImage("C:\\Users\\Public\\Pictures\\Sample Pictures\\Chrysanthemum.jpg");
         new_toon.SaveToon("C:\\Users\\ina\\ToonTest");
-        new_toon.PushAlloc("localhost", 3000);
-        new_toon.PushEpisodes("localhost", 3000);
+      //  new_toon.PushAlloc("localhost", 3000);
+     //   new_toon.PushEpisodes("localhost", 3000);
     }
 
     public static void main (String [] args) throws Exception {
