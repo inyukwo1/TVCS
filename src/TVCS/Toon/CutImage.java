@@ -13,7 +13,7 @@ import java.io.Serializable;
 /**
  * Created by ina on 2017-06-02.
  */
-public class CutImage implements Serializable{
+public class CutImage implements Serializable {
     transient Toon parentToon;
     transient Episode parentScene;
     transient Cut parentCut;

@@ -51,6 +51,23 @@ public class FileManager {
         return true;
     }
 
+    public static Object LoadSerializableObject(String path) {
+        Object object = null;
+        try {
+            FileInputStream fileInputStream = new FileInputStream(path);
+            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+            object = objectInputStream.readObject();
+            fileInputStream.close();
+        } catch (IOException e) {
+            System.out.println("File couldn't be read");
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            return object;
+        }
+    }
+
     public static int NumFilesInDirectory(String path) {
         File directory = new File(path);
         return directory.list().length;

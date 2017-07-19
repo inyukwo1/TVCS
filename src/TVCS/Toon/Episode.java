@@ -1,7 +1,10 @@
 package TVCS.Toon;
 
+import TVCS.Toon.Branch.Branch;
+import TVCS.Toon.EpisodeTree.EpisodeTree;
 import TVCS.Utils.FileManager;
 import TVCS.Utils.Rectangle;
+import javafx.scene.image.*;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -17,10 +20,10 @@ public class Episode implements Serializable{
     //TODO 최근 Save 이후로 변동사항이 있는가?
     transient Toon parent_toon;
 
-    public EpisodeInfo episodeInfo;
+    // This is saved with EpisodeTree
+    public transient EpisodeInfo episodeInfo;
 
     public ArrayList<Cut> cuts;
-
 
     public Episode(Toon parent_toon, String name, int width, int height) {
         this.parent_toon = parent_toon;
@@ -89,23 +92,20 @@ public class Episode implements Serializable{
         }
     }
 
+    static public Episode load(Toon toon, EpisodeInfo episodeInfo) {
+        String name = episodeInfo.name;
+        Episode episode = (Episode) FileManager.LoadSerializableObject
+                (toon.toonPath() + File.separator + name + File.separator + name);
+        episode.episodeInfo = episodeInfo;
+        episode.Loadtransient(toon);
+        return episode;
+    }
+
     public void Loadtransient(Toon parent_toon) {
         this.parent_toon = parent_toon;
         for(Cut cut : cuts) {
             cut.Loadtransient(parent_toon, this);
         }
-    }
-
-    public void LinkBranchVertex() {
-        episodeInfo.branchVertex = parent_toon.FindBranchVertex(episodeInfo.id);
-    }
-
-    public void LinkBranchVertex(BranchVertex branchVertex) {
-        episodeInfo.branchVertex = branchVertex;
-    }
-
-    public BranchVertex getBranchVertex() {
-        return episodeInfo.branchVertex;
     }
 
     public String sceneDirPath() {

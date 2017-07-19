@@ -1,7 +1,9 @@
 package GUI;
 
+import GUI.EpisodeTree.EpisodeTreeManager;
 import TVCS.Toon.Episode;
 import TVCS.Toon.Toon;
+import TVCS.Utils.DiscreteLocation;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -21,13 +23,14 @@ import java.util.ArrayList;
 public class ToonManager {
     //TODO rightpane align
     Toon toon;
-    BranchManager branchManager;
+    EpisodeTreeManager episodeTreeManager;
     ArrayList<EpisodeManager> episodeManagers = new ArrayList<>();
     PushManager pushManager;
-    BorderPane toonPane;
+    BorderPane toonPane = new BorderPane();
 
     StackPane topPane;
-    TabPane centerPane;
+    BorderPane centerContainerPane = new BorderPane();
+    TabPane centerPane = new TabPane();
     GridPane rightPane;
 
     Button addNewCutButton;
@@ -38,7 +41,7 @@ public class ToonManager {
     public ToonManager(Toon toon) {
         this.toon = toon;
         this.pushManager = new PushManager(toon);
-        this.branchManager = new BranchManager(toon.getBranch());
+        this.episodeTreeManager = new EpisodeTreeManager(toon.getEpisodeTree(), centerContainerPane);
         this.addNewCutButton = makeAddNewCutButton();
     }
 
@@ -47,7 +50,6 @@ public class ToonManager {
     }
 
     public void start(BorderPane rootPane) {
-        this.toonPane = new BorderPane();
         fillBorderPane();
         rootPane.setCenter(toonPane);
     }
@@ -65,7 +67,13 @@ public class ToonManager {
     }
 
     public void makeNewEpisode(String episodeName) {
-        Episode newEpisode = toon.AddNewEpisode(episodeName, defaultWidth, defaultHeight);
+        DiscreteLocation nextContentLocation = episodeTreeManager.nextContentLocation();
+        if (nextContentLocation == null) {
+            //TODO fail control
+            return;
+        }
+        Episode newEpisode = toon.AddNewEpisode(episodeName, defaultWidth, defaultHeight,
+                nextContentLocation, episodeTreeManager.episodeTreePane);
         EpisodeManager newEpisodeManager = new EpisodeManager(newEpisode);
         newEpisodeManager.start(centerPane);
         episodeManagers.add(newEpisodeManager);
@@ -119,7 +127,7 @@ public class ToonManager {
     }
 
     private void fillRightPane() {
-        rightPane.add(branchManager.makeShowButton(), 0, 0);
+        rightPane.add(episodeTreeManager.makeShowButton(), 0, 0);
         rightPane.add(pushManager.getRegisterToonButton(), 0, 1);
         rightPane.add(pushManager.getPushAllButton(), 0, 2);
         rightPane.add(makeNewEpisodeButton(), 0, 4);
@@ -150,9 +158,9 @@ public class ToonManager {
     }
 
     private void addCenterPane() {
-        centerPane = new TabPane();
         centerPane.setBackground(new Background(new BackgroundFill(Color.DARKGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
-        toonPane.setCenter(centerPane);
+        toonPane.setCenter(centerContainerPane);
+        centerContainerPane.setCenter(centerPane);
     }
 
     private void whenFirstEpisodeMade() {

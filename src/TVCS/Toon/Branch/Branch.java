@@ -1,4 +1,8 @@
-package TVCS.Toon;
+package TVCS.Toon.Branch;
+
+import TVCS.Toon.Episode;
+import TVCS.Toon.Toon;
+import TVCS.Toon.Branch.BranchVertex;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -6,6 +10,7 @@ import java.util.ArrayList;
 /**
  * Created by ina on 2017-06-02.
  */
+@Deprecated
 public class Branch implements Serializable{
     transient Toon parent_toon;
     transient ArrayList <BranchVertex> branchVertices;
@@ -69,7 +74,7 @@ public class Branch implements Serializable{
             }
         }
         return null;
-    }
+}
 
     public String branchPath() {
         return parent_toon.toonPath() + File.separator + "branch";

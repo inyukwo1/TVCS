@@ -1,10 +1,13 @@
-package TVCS.Toon;
+package TVCS.Toon.Branch;
+
+import TVCS.Toon.Toon;
 
 import java.io.Serializable;
 
 /**
  * Created by ina on 2017-06-04.
  */
+@Deprecated
 public class BranchEdge implements Serializable{
     transient Toon parent_toon;
 

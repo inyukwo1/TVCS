@@ -1,4 +1,7 @@
-package TVCS.Toon;
+package TVCS.Toon.Branch;
+
+import TVCS.Toon.Episode;
+import TVCS.Toon.Toon;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -6,7 +9,8 @@ import java.util.ArrayList;
 /**
  * Created by ina on 2017-06-04.
  */
-public class BranchVertex implements Serializable{
+@Deprecated
+public class BranchVertex implements Serializable {
     transient Toon parent_toon;
 
     boolean is_root;
@@ -71,7 +75,7 @@ public class BranchVertex implements Serializable{
             return;
         }
         this.parent_toon = parent_toon;
-        this.parent_toon.LoadToBranchVertices(this);
+        // this.parent_toon.LoadToBranchVertices(this);
         for(BranchEdge edge : edges) {
             edge.LoadtransientRecursively(parent_toon);
         }

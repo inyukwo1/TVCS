@@ -1,6 +1,12 @@
 package TVCS.Toon;
 
-import GUI.GuiClientAuthorizer;
+import GUI.EpisodeTree.EpisodeTreeContent;
+import GUI.EpisodeTree.EpisodeTreePane;
+import TVCS.Toon.Branch.Branch;
+import TVCS.Toon.EpisodeTree.EpisodeTree;
+import TVCS.Toon.EpisodeTree.EpisodeVertex;
+import TVCS.Toon.EpisodeTree.EpisodeVertexBase;
+import TVCS.Utils.DiscreteLocation;
 import TVCS.Utils.FileManager;
 
 import java.io.*;
@@ -14,7 +20,7 @@ public class Toon {
     String toon_path;
 
     public ToonInfo toon_info;
-    public Branch branch;
+    public EpisodeTree episodeTree;
     public ArrayList<Episode> loadedEplisodes;
 
     //used when create new toon
@@ -44,7 +50,7 @@ public class Toon {
     }
 
     private boolean MakeToonStructure() {
-        branch = new Branch(this);
+        episodeTree = new EpisodeTree();
         return true;
     }
 
@@ -64,10 +70,30 @@ public class Toon {
         toon_info.toonId = toonId;
     }
 
+    public EpisodeTree getEpisodeTree() {
+        return episodeTree;
+    }
+
+    public boolean SaveToon(String path) {
+        this.toon_path = path;
+        return SaveToon();
+    }
+
+    public boolean SaveToon() {
+        if (this.toon_path.equals("")) {
+            return false;
+        }
+        FileManager.MakeDirectory(toon_path);
+        toon_info.Save(toon_path + File.separator + "tooninfo");
+        episodeTree.save(toonPath());
+        SaveEpisodes();
+        return true;
+    }
+
     public boolean LoadToon(String path) {
         this.toon_path = path;
         LoadToonInfo();
-        LoadBranch();
+        episodeTree = EpisodeTree.load(toonPath());
         return true;
     }
 
@@ -86,41 +112,6 @@ public class Toon {
         }
     }
 
-    private void LoadBranch() {
-        try {
-            FileInputStream fileInputStream = new FileInputStream(toon_path + File.separator + "branch");
-            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-            branch = (Branch) objectInputStream.readObject();
-            fileInputStream.close();
-        } catch (IOException e) {
-            System.out.println("File couldn't be read");
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        branch.Loadtransient(this);
-    }
-
-    public Branch getBranch() {
-        return branch;
-    }
-
-    public boolean SaveToon(String path) {
-        this.toon_path = path;
-        return SaveToon();
-    }
-
-    public boolean SaveToon() {
-        if (this.toon_path.equals("")) {
-            return false;
-        }
-        FileManager.MakeDirectory(toon_path);
-        toon_info.Save(toon_path + File.separator + "tooninfo");
-        branch.Save();
-        SaveEpisodes();
-        return true;
-    }
-
     public boolean hasPath() {
         if (toon_path.equals("")) {
             return false;
@@ -128,42 +119,23 @@ public class Toon {
         return true;
     }
 
-    public Episode AddNewEpisode(String name, int width, int height) {
+    public Episode AddNewEpisode(String name, int width, int height,
+                                 DiscreteLocation nextContentLocation, EpisodeTreePane episodeTreePane) {
         Episode newEpisode = new Episode(this, name, width, height);
         if(!newEpisode.MakeNewEpisode()){
             System.out.println("Making new episode failed");
             return null;
         }
         loadedEplisodes.add(newEpisode);
-        BranchVertex newVertex = branch.AddNewVertex(newEpisode);
-        newEpisode.LinkBranchVertex(newVertex);
+        EpisodeVertexBase newEpisodeVertex = episodeTree.addNewVertex(newEpisode, nextContentLocation);
+        episodeTreePane.makeAndAddEpisodeTreeContent(newEpisodeVertex);
         return newEpisode;
     }
 
-    public Episode LoadEpisode(String episodeName) {
-        Episode episode = null;
-        try {
-            FileInputStream fileInputStream = new FileInputStream(toon_path + File.separator + episodeName + File.separator + episodeName);
-            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-            episode = (Episode) objectInputStream.readObject();
-            loadedEplisodes.add(episode);
-            fileInputStream.close();
-        } catch (IOException e) {
-            System.out.println("File couldn't be read");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        episode.Loadtransient(this);
-        episode.LinkBranchVertex();
+    public Episode LoadEpisode(EpisodeVertex episodeVertex) {
+        Episode episode = Episode.load(this, episodeVertex.episodeInfo);
+        loadedEplisodes.add(episode);
         return episode;
-    }
-
-    public void LoadToBranchVertices(BranchVertex branchVertex) {
-        branch.LoadToBranchVertices(branchVertex);
-    }
-
-    public BranchVertex FindBranchVertex(long id) {
-        return branch.FindBranchVertex(id);
     }
 
     public boolean hasToSave() {
