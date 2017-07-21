@@ -12,21 +12,27 @@ import java.util.ArrayList;
  */
 public class EpisodeSet extends EpisodeVertexBase {
     private static Image DEFAULT_THUMBNAIL = new Image("Bookshelf.jpg");
+    private static String DEFAULT_NAME = "Episodes";
 
     public ArrayList<EpisodeVertexBase> children = new ArrayList<>();
     String name;
 
     public EpisodeSet(String name, DiscreteLocation contentLocation) {
         super(contentLocation);
-        this.name = name;
+        if (name != null) {
+            this.name = name;
+        } else {
+            this.name = DEFAULT_NAME;
+        }
     }
 
     public void addChild(EpisodeVertexBase child) {
         children.add(child);
-        if (child.parent != null) {
-            parent.children.remove(child);
-        }
         child.parent = this;
+    }
+
+    public void removeChild(EpisodeVertexBase child) {
+        children.remove(child);
     }
 
     @Override
@@ -38,5 +44,10 @@ public class EpisodeSet extends EpisodeVertexBase {
     public Image thumbnail() {
         //TODO
         return DEFAULT_THUMBNAIL;
+    }
+
+    @Override
+    public boolean isSet() {
+        return true;
     }
 }

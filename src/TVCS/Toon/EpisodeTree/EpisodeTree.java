@@ -38,4 +38,13 @@ public class EpisodeTree implements Serializable {
     public ArrayList<EpisodeVertexBase> firstLevelVertices() {
         return root.children;
     }
+
+    public EpisodeSet mergeTwoEpisodeVertex(EpisodeVertex vertex1, EpisodeVertex vertex2) {
+        EpisodeSet newEpisodeSet = new EpisodeSet(null, vertex1.getLocationInParent());
+        vertex1.removeParent();
+        vertex2.removeParent();
+        newEpisodeSet.addChild(vertex1);
+        newEpisodeSet.addChild(vertex2);
+        return newEpisodeSet;
+    }
 }

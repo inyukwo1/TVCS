@@ -21,7 +21,11 @@ abstract public class EpisodeVertexBase implements Serializable {
 
     abstract public String name();
     abstract public Image thumbnail();
+    abstract public boolean isSet();
     public DiscreteLocation getLocationInParent() {
         return locationInParent;
+    }
+    public void removeParent() {
+        parent.children.remove(this);
     }
 }

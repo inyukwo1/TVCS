@@ -31,4 +31,9 @@ public class EpisodeVertex extends EpisodeVertexBase {
         return episodeInfo.thumbnail;
     }
 
+    @Override
+    public boolean isSet() {
+        return false;
+    }
+
 }

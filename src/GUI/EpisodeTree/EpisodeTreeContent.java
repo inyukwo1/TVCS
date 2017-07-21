@@ -27,6 +27,7 @@ public class EpisodeTreeContent{
 
 
     EpisodeVertexBase content;
+    SetPane setPane = new SetPane();
 
     VBox container = new VBox();
     VBox thumbnailContainer = new VBox();
@@ -39,6 +40,7 @@ public class EpisodeTreeContent{
     private double mouseLocationY = 0;
 
     boolean dragging = false;
+    EpisodeTreeContent mergeContent;
 
     public EpisodeTreeContent(EpisodeVertexBase content, EpisodeTreePane episodeTreePane) {
         this.content = content;
@@ -68,10 +70,6 @@ public class EpisodeTreeContent{
         setThumbnail();
         setLocation();
         setContainerEvents(episodeTreePane);
-    }
-
-    public boolean hasSpace(int xLocation, int yLocation) {
-        return content.getLocationInParent().x == xLocation && content.getLocationInParent().y == yLocation;
     }
 
     public DiscreteLocation location() {
@@ -104,6 +102,15 @@ public class EpisodeTreeContent{
 
     public static int CONTENT_BLOCK_HEIGHT() {
         return EpisodeTreePane.MARGIN * 2 + HEIGHT;
+    }
+
+    public boolean containsSet() {
+        return content.isSet();
+    }
+
+    public void addContent(EpisodeTreeContent content) {
+        assert (containsSet());
+        setPane.addContent(content);
     }
 
     private void setContainerEvents(EpisodeTreePane episodeTreePane) {
@@ -153,6 +160,17 @@ public class EpisodeTreeContent{
                     container.setLayoutY(nodeLocationY);
                     mouseLocationX = event.getSceneX();
                     mouseLocationY = event.getSceneY();
+                    EpisodeTreeContent tempMergeContent = getMergeContent(
+                            (int) nodeLocationX + WIDTH / 2, (int) nodeLocationY + HEIGHT / 2,
+                            episodeTreePane);
+                    if (tempMergeContent != mergeContent) {
+                        if (mergeContent != null) {
+                            //TODO
+                        } else {
+                            //TODO
+                        }
+                    }
+                    mergeContent = tempMergeContent;
                 }
             }
         });
@@ -160,15 +178,50 @@ public class EpisodeTreeContent{
             @Override
             public void handle(MouseEvent event) {
                 dragging = false;
-                DiscreteLocation toLocation = getDiscreteLocationFromPixelLocation(
-                        (int) nodeLocationX, (int) nodeLocationY);
-                episodeTreePane.moveToLocation(episodeTreeContentThis, toLocation);
+                if (mergeContent != null) {
+                    // Merge Content
+                    if (mergeContent.containsSet()) {
+                        // join into the set
+                        episodeTreePane.moveIntoSetContent(mergeContent, episodeTreeContentThis);
+                    } else {
+                        // make a set and merge both
+                        episodeTreePane.mergeTwoVertexContents(mergeContent, episodeTreeContentThis);
+                    }
+                } else {
+                    DiscreteLocation toLocation = getDiscreteLocationFromPixelLocation(
+                            (int) nodeLocationX + WIDTH / 2, (int) nodeLocationY + HEIGHT / 2);
+                    episodeTreePane.moveToLocation(episodeTreeContentThis, toLocation);
+                }
                 episodeTreePane.contentsSetLocation();
             }
         });
     }
 
+    private EpisodeTreeContent getMergeContent(int locX, int locY, EpisodeTreePane episodeTreePane) {
+        if (locX < 0 || locY < 0) {
+            return null;
+        }
+        int discreteX = locX / CONTENT_BLOCK_WIDTH();
+        int discreteY = locY / CONTENT_BLOCK_HEIGHT();
+        if (episodeTreePane.episodeTreeContents.size() <= discreteY) {
+            return null;
+        }
+        if (locX % CONTENT_BLOCK_WIDTH() <= EpisodeTreePane.MARGIN * 2 ||
+                locX % CONTENT_BLOCK_WIDTH() > CONTENT_BLOCK_WIDTH() - EpisodeTreePane.MARGIN * 2) {
+            return null;
+        }
+        if (episodeTreePane.episodeTreeContents.get(discreteY).size() <= discreteX) {
+            return null;
+        }
+        return episodeTreePane.episodeTreeContents.get(discreteY).get(discreteX);
+    }
+
     private DiscreteLocation getDiscreteLocationFromPixelLocation(int locX, int locY) {
-        return new DiscreteLocation(locX / CONTENT_BLOCK_WIDTH(), locY / CONTENT_BLOCK_HEIGHT());
+        int discreteX = (locX -  CONTENT_BLOCK_WIDTH() / 2) / CONTENT_BLOCK_WIDTH() ;
+        int discreteY = locY / CONTENT_BLOCK_HEIGHT();
+
+        discreteX = discreteX <= 0 ? 0 : discreteX;
+        discreteY = discreteY <= 0 ? 0 : discreteY;
+        return new DiscreteLocation(discreteX, discreteY);
     }
 }

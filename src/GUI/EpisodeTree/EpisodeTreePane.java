@@ -1,6 +1,8 @@
 package GUI.EpisodeTree;
 
+import TVCS.Toon.EpisodeTree.EpisodeSet;
 import TVCS.Toon.EpisodeTree.EpisodeTree;
+import TVCS.Toon.EpisodeTree.EpisodeVertex;
 import TVCS.Toon.EpisodeTree.EpisodeVertexBase;
 import TVCS.Utils.DiscreteLocation;
 import javafx.scene.layout.Pane;
@@ -8,6 +10,7 @@ import javafx.util.Pair;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Map;
 
 
 /**
@@ -26,7 +29,6 @@ public class EpisodeTreePane {
 
     Pane pane = new Pane();
     ArrayList<LinkedList<EpisodeTreeContent>> episodeTreeContents = new ArrayList<>();
-
 
     public EpisodeTreePane() {
         pane.setMaxHeight(paneHeight);
@@ -65,8 +67,12 @@ public class EpisodeTreePane {
 
     public void makeAndAddEpisodeTreeContent(EpisodeVertexBase episodeVertexBase) {
         EpisodeTreeContent newEpisodeTreeContent = new EpisodeTreeContent(episodeVertexBase, this);
-        episodeTreeContents.get(newEpisodeTreeContent.location().y).add(newEpisodeTreeContent.location().x, newEpisodeTreeContent);
-        pane.getChildren().add(newEpisodeTreeContent.container);
+        addContent(newEpisodeTreeContent);
+    }
+
+    private void addContent(EpisodeTreeContent content) {
+        episodeTreeContents.get(content.location().y).add(content.location().x, content);
+        pane.getChildren().addAll(content.container);
     }
 
     public void moveToLocation(EpisodeTreeContent selectedContent, DiscreteLocation location) {
@@ -89,6 +95,30 @@ public class EpisodeTreePane {
                 i++;
             }
         }
+    }
+
+    public void mergeTwoVertexContents(EpisodeTreeContent vertexContent1, EpisodeTreeContent vertexContent2) {
+        assert (!vertexContent1.containsSet());
+        assert (!vertexContent2.containsSet());
+        EpisodeSet newSet = episodeTree.mergeTwoEpisodeVertex(
+                (EpisodeVertex) vertexContent1.content, (EpisodeVertex) vertexContent2.content);
+        EpisodeTreeContent setContent = new EpisodeTreeContent(newSet, this);
+        removeContent(vertexContent1);
+        removeContent(vertexContent2);
+        setContent.addContent(vertexContent1);
+        setContent.addContent(vertexContent2);
+        addContent(setContent);
+    }
+
+    public void moveIntoSetContent(EpisodeTreeContent setContent, EpisodeTreeContent vertexContent) {
+        assert (setContent.containsSet());
+        removeContent(vertexContent);
+        setContent.addContent(vertexContent);
+    }
+
+    private void removeContent(EpisodeTreeContent content) {
+        episodeTreeContents.get(content.location().y).remove(content);
+        pane.getChildren().remove(content.container);
     }
 
     private void constructEpisodeTreeContents() {
