@@ -44,6 +44,19 @@ public class EpisodeManager {
         tabPane.getTabs().add(tab);
     }
 
+    //TODO 중심을 기준으로 resize
+    public void resizeWidth(int width) {
+        workPane.setMinWidth(width);
+        workPane.setMaxWidth(width);
+        episode.resizeWidth(width);
+    }
+
+    public void resizeHeight(int height) {
+        workPane.setMinWidth(height);
+        workPane.setMaxWidth(height);
+        episode.resizeHeight(height);
+    }
+
     public void startAddCutMode() {
         if(addingCut) {
             return;

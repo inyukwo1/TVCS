@@ -119,9 +119,8 @@ public class Toon {
         return true;
     }
 
-    public Episode AddNewEpisode(String name, int width, int height,
-                                 DiscreteLocation nextContentLocation, EpisodeTreePane episodeTreePane) {
-        Episode newEpisode = new Episode(this, name, width, height);
+    public Episode AddNewEpisode(String name, DiscreteLocation nextContentLocation, EpisodeTreePane episodeTreePane) {
+        Episode newEpisode = new Episode(this, name);
         if(!newEpisode.MakeNewEpisode()){
             System.out.println("Making new episode failed");
             return null;

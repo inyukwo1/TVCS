@@ -53,6 +53,10 @@ public class FileManager {
 
     public static Object LoadSerializableObject(String path) {
         Object object = null;
+        File file = new File(path);
+        if (!file.exists()) {
+            return null;
+        }
         try {
             FileInputStream fileInputStream = new FileInputStream(path);
             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);

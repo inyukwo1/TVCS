@@ -6,11 +6,9 @@ import TVCS.Toon.EpisodeTree.EpisodeVertex;
 import TVCS.Toon.EpisodeTree.EpisodeVertexBase;
 import TVCS.Utils.DiscreteLocation;
 import javafx.scene.layout.Pane;
-import javafx.util.Pair;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Map;
 
 
 /**
@@ -71,7 +69,12 @@ public class EpisodeTreePane {
     }
 
     private void addContent(EpisodeTreeContent content) {
-        episodeTreeContents.get(content.location().y).add(content.location().x, content);
+        if (episodeTreeContents.get(content.location().y).size() < content.location().x) {
+            episodeTreeContents.get(content.location().y).add(content);
+            content.location().x = episodeTreeContents.get(content.location().y).indexOf(content);
+        } else {
+            episodeTreeContents.get(content.location().y).add(content.location().x, content);
+        }
         pane.getChildren().addAll(content.container);
     }
 
@@ -108,12 +111,31 @@ public class EpisodeTreePane {
         setContent.addContent(vertexContent1);
         setContent.addContent(vertexContent2);
         addContent(setContent);
+        contentsSetLocation();
     }
 
     public void moveIntoSetContent(EpisodeTreeContent setContent, EpisodeTreeContent vertexContent) {
         assert (setContent.containsSet());
         removeContent(vertexContent);
         setContent.addContent(vertexContent);
+    }
+
+    public void movePivotRight(int pivotX, int pivotY, int moveRight) {
+        for (LinkedList<EpisodeTreeContent> episodeTreeContentLinkedList: episodeTreeContents) {
+            for (EpisodeTreeContent episodeTreeContent : episodeTreeContentLinkedList) {
+                if (episodeTreeContent.location().x > pivotX && episodeTreeContent.location().y <= pivotY) {
+                    episodeTreeContent.setMoveToRight(moveRight);
+                }
+            }
+        }
+    }
+
+    public void resetMovePivotRight() {
+        for (LinkedList<EpisodeTreeContent> episodeTreeContentLinkedList: episodeTreeContents) {
+            for (EpisodeTreeContent episodeTreeContent : episodeTreeContentLinkedList) {
+                episodeTreeContent.resetMoveToRight();
+            }
+        }
     }
 
     private void removeContent(EpisodeTreeContent content) {

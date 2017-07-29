@@ -18,22 +18,37 @@ import java.util.ArrayList;
 public class Episode implements Serializable{
     //TODO 최근 Push / Pull 후 변동사항이 있는가?
     //TODO 최근 Save 이후로 변동사항이 있는가?
+    public static int DEFAULT_WIDTH = 500;
+    public static int MIN_WIDTH = 100;
+    public static int MAX_WIDTH = 1000;
+    public static int DEFAULT_HEIGHT = 3000;
+    public static int MIN_HEIGHT = 500;
+    public static int MAX_HEIGHT = 10000;
+
     transient Toon parent_toon;
+
 
     // This is saved with EpisodeTree
     public transient EpisodeInfo episodeInfo;
 
     public ArrayList<Cut> cuts;
 
-    public Episode(Toon parent_toon, String name, int width, int height) {
+    public Episode(Toon parent_toon, String name) {
         this.parent_toon = parent_toon;
-        this.episodeInfo = new EpisodeInfo(name, parent_toon.GenerateID(), width, height);
+        this.episodeInfo = new EpisodeInfo(name, parent_toon.GenerateID(), DEFAULT_WIDTH, DEFAULT_HEIGHT);
         this.cuts = new ArrayList<Cut>();
     }
 
     public boolean MakeNewEpisode() {
         //TODO 이미 있는 scene인지 검사
         return true;
+    }
+
+    public void resizeWidth(int width) {
+        episodeInfo.width = width;
+    }
+    public void resizeHeight(int height) {
+        episodeInfo.height = height;
     }
 
     public Cut AddNewCut(double x, double y, int width, int height) {
@@ -96,12 +111,16 @@ public class Episode implements Serializable{
         String name = episodeInfo.name;
         Episode episode = (Episode) FileManager.LoadSerializableObject
                 (toon.toonPath() + File.separator + name + File.separator + name);
+        if (episode == null) {
+            // Episode does not exist in disk
+            return null;
+        }
         episode.episodeInfo = episodeInfo;
         episode.Loadtransient(toon);
         return episode;
     }
 
-    public void Loadtransient(Toon parent_toon) {
+    private void Loadtransient(Toon parent_toon) {
         this.parent_toon = parent_toon;
         for(Cut cut : cuts) {
             cut.Loadtransient(parent_toon, this);

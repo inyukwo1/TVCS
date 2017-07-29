@@ -1,14 +1,16 @@
 package GUI.EpisodeTree;
 
-import TVCS.Toon.EpisodeTree.EpisodeTree;
+import GUI.ToonManager;
+import TVCS.Toon.Episode;
+import TVCS.Toon.EpisodeTree.EpisodeVertex;
 import TVCS.Toon.EpisodeTree.EpisodeVertexBase;
+import TVCS.Toon.Toon;
 import TVCS.Utils.DiscreteLocation;
 import TVCS.WorkSpace;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
@@ -25,9 +27,8 @@ public class EpisodeTreeContent{
     private static int TEXT_HEIGHT = 20;
     private static int THUMBNAIL_HEIGHT = 100;
 
-
+    EpisodeTreePane parentTreePane;
     EpisodeVertexBase content;
-    SetPane setPane = new SetPane();
 
     VBox container = new VBox();
     VBox thumbnailContainer = new VBox();
@@ -42,12 +43,21 @@ public class EpisodeTreeContent{
     boolean dragging = false;
     EpisodeTreeContent mergeContent;
 
-    public EpisodeTreeContent(EpisodeVertexBase content, EpisodeTreePane episodeTreePane) {
+    // When set selected
+    int moveToRight = 0;
+
+    // Used in set
+    boolean setSelected = false;
+    SetPane setPane = new SetPane();
+
+    public EpisodeTreeContent(EpisodeVertexBase content, EpisodeTreePane parentTreePane) {
         this.content = content;
+        this.parentTreePane = parentTreePane;
         container.setMaxHeight(HEIGHT);
         container.setMinHeight(HEIGHT);
         container.setMaxWidth(WIDTH);
         container.setMinWidth(WIDTH);
+        container.setAlignment(Pos.CENTER);
 
         thumbnailContainer.setMaxHeight(THUMBNAIL_HEIGHT);
         thumbnailContainer.setMinHeight(THUMBNAIL_HEIGHT);
@@ -62,23 +72,20 @@ public class EpisodeTreeContent{
         textContainer.setMaxWidth(WIDTH);
         textContainer.setMinWidth(WIDTH);
 
-        container.setAlignment(Pos.CENTER);
+
         thumbnailContainer.setAlignment(Pos.CENTER);
         textContainer.setAlignment(Pos.CENTER);
-        container.getChildren().addAll(thumbnailContainer, textContainer);
+
+
         setEpisodeName();
         setThumbnail();
+        attachThumbnailAndText();
         setLocation();
-        setContainerEvents(episodeTreePane);
+        setContainerEvents();
     }
 
     public DiscreteLocation location() {
         return content.getLocationInParent();
-    }
-
-    private void setEpisodeName() {
-        Text episodeName = new Text(content.name());
-        textContainer.getChildren().add(episodeName);
     }
 
     private void setThumbnail() {
@@ -91,8 +98,21 @@ public class EpisodeTreeContent{
         thumbnailContainer.getChildren().add(imageView);
     }
 
+    private void setEpisodeName() {
+        Text episodeName = new Text(content.name());
+        textContainer.getChildren().add(episodeName);
+    }
+
+    private void attachThumbnailAndText() {
+        container.getChildren().addAll(thumbnailContainer, textContainer);
+    }
+
+    private void detachThumbnailAndText() {
+        container.getChildren().removeAll(thumbnailContainer, textContainer);
+    }
+
     public void setLocation() {
-        container.setLayoutX(EpisodeTreePane.MARGIN + CONTENT_BLOCK_WIDTH() * location().x);
+        container.setLayoutX(EpisodeTreePane.MARGIN + CONTENT_BLOCK_WIDTH() * (location().x + moveToRight));
         container.setLayoutY(EpisodeTreePane.MARGIN + CONTENT_BLOCK_HEIGHT() * location().y);
     }
 
@@ -113,9 +133,17 @@ public class EpisodeTreeContent{
         setPane.addContent(content);
     }
 
-    private void setContainerEvents(EpisodeTreePane episodeTreePane) {
+    public void setMoveToRight(int moveToRight) {
+        this.moveToRight = moveToRight;
+    }
+
+    public void resetMoveToRight() {
+        this.moveToRight = 0;
+    }
+
+    private void setContainerEvents() {
         setContainerChangeMouseCursor();
-        setContainerDragEvents(episodeTreePane);
+        setContainerDragEvents();
     }
 
     private void setContainerChangeMouseCursor() {
@@ -133,13 +161,82 @@ public class EpisodeTreeContent{
         });
     }
 
-    private void setContainerDragEvents(EpisodeTreePane episodeTreePane) {
+    private void setContainerDragEvents() {
         EpisodeTreeContent episodeTreeContentThis = this;
+        container.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if (dragging) {
+                    dragging = false;
+                    return;
+                }
+                if (containsSet()){
+                    //open set
+                    //TODO span되면서 parentPane 사이즈도 키우기
+                    //TODO set 안에서 set 만들 때 NullpointerException
+                    if (!setSelected) {
+                        setSelected = true;
+                        container.setMaxWidth(setPane.paneWidth() * CONTENT_BLOCK_WIDTH());
+                        container.setMinWidth(setPane.paneWidth() * CONTENT_BLOCK_WIDTH());
+                        container.setMaxHeight(setPane.paneHeight() * CONTENT_BLOCK_HEIGHT());
+                        container.setMinHeight(setPane.paneHeight() * CONTENT_BLOCK_HEIGHT());
+                        container.setBorder(new Border(new BorderStroke(Color.BLACK,
+                                BorderStrokeStyle.SOLID, new CornerRadii(10), new BorderWidths(3), new Insets(5))));
+                        setPane.setPaneSize();
+                        detachThumbnailAndText();
+                        container.getChildren().add(setPane.pane);
+                        parentTreePane.movePivotRight(location().x, location().y, setPane.paneWidth() - 1);
+                        parentTreePane.contentsSetLocation();
+                    } else {
+                        setSelected = false;
+                        container.getChildren().remove(setPane.pane);
+                        container.setMaxHeight(HEIGHT);
+                        container.setMinHeight(HEIGHT);
+                        container.setMaxWidth(WIDTH);
+                        container.setMinWidth(WIDTH);
+                        container.setBorder(Border.EMPTY);
+                        attachThumbnailAndText();
+                        parentTreePane.resetMovePivotRight();
+                        parentTreePane.contentsSetLocation();
+                    }
+                } else {
+                    // Open Episode
+                    ToonManager currentToonManager = WorkSpace.mainApp.toonManager;
+                    Toon currentToon = currentToonManager.toon;
+                    for (Episode episode: currentToon.loadedEplisodes) {
+                        if (matchesEpisode(episode)) {
+                            // Episode already loaded
+                            currentToonManager.selectTab(episode);
+                            afterClicked();
+                            event.consume();
+                            return;
+                        }
+                    }
+                    // Episode didn't loaded already
+                    if (currentToonManager.loadEpisode((EpisodeVertex) content)) {
+                        // loaded well
+                        afterClicked();
+                        event.consume();
+                        return;
+                    }
+                    // TODO if there is not episode in disk, find it in server
+                }
+                afterClicked();
+                event.consume();
+            }
+
+            private void afterClicked() {
+                dragging = false;
+                mergeContent = null;
+            }
+        });
         container.setOnMousePressed(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+                if (setSelected) {
+                    return;
+                }
                 if (event.getButton() == MouseButton.PRIMARY) {
-                    dragging = true;
                     mouseLocationX = event.getSceneX();
                     mouseLocationY = event.getSceneY();
 
@@ -151,6 +248,10 @@ public class EpisodeTreeContent{
         container.setOnMouseDragged(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+                dragging = true;
+                if (setSelected) {
+                    return;
+                }
                 if (event.getButton() == MouseButton.PRIMARY) {
                     double deltaX = event.getSceneX() - mouseLocationX;
                     double deltaY = event.getSceneY() - mouseLocationY;
@@ -162,12 +263,12 @@ public class EpisodeTreeContent{
                     mouseLocationY = event.getSceneY();
                     EpisodeTreeContent tempMergeContent = getMergeContent(
                             (int) nodeLocationX + WIDTH / 2, (int) nodeLocationY + HEIGHT / 2,
-                            episodeTreePane);
+                            parentTreePane);
                     if (tempMergeContent != mergeContent) {
                         if (mergeContent != null) {
-                            //TODO
+                            //TODO animation
                         } else {
-                            //TODO
+                            //TODO animation
                         }
                     }
                     mergeContent = tempMergeContent;
@@ -177,22 +278,26 @@ public class EpisodeTreeContent{
         container.setOnMouseReleased(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                dragging = false;
-                if (mergeContent != null) {
+                if (setSelected) {
+                    return;
+                }
+                if (mergeContent != null && mergeContent != episodeTreeContentThis) {
                     // Merge Content
                     if (mergeContent.containsSet()) {
                         // join into the set
-                        episodeTreePane.moveIntoSetContent(mergeContent, episodeTreeContentThis);
+                        parentTreePane.moveIntoSetContent(mergeContent, episodeTreeContentThis);
                     } else {
                         // make a set and merge both
-                        episodeTreePane.mergeTwoVertexContents(mergeContent, episodeTreeContentThis);
+                        parentTreePane.mergeTwoVertexContents(mergeContent, episodeTreeContentThis);
                     }
-                } else {
+                } else if (mergeContent != episodeTreeContentThis) {
                     DiscreteLocation toLocation = getDiscreteLocationFromPixelLocation(
                             (int) nodeLocationX + WIDTH / 2, (int) nodeLocationY + HEIGHT / 2);
-                    episodeTreePane.moveToLocation(episodeTreeContentThis, toLocation);
+                    parentTreePane.moveToLocation(episodeTreeContentThis, toLocation);
                 }
-                episodeTreePane.contentsSetLocation();
+                parentTreePane.contentsSetLocation();
+                mergeContent = null;
+                event.consume();
             }
         });
     }
@@ -224,4 +329,14 @@ public class EpisodeTreeContent{
         discreteY = discreteY <= 0 ? 0 : discreteY;
         return new DiscreteLocation(discreteX, discreteY);
     }
+
+    private boolean matchesEpisode(Episode episode) {
+        // EpisodeVertex and corresponding Episode has the same episodeInfo
+        if (((EpisodeVertex) content).episodeInfo == episode.episodeInfo) {
+            return true;
+        }
+        return false;
+    }
+
+
 }
