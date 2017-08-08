@@ -1,26 +1,23 @@
 package TVCS.Toon;
 
+import java.math.BigInteger;
+
 /**
  * Created by ina on 2017-06-06.
  */
-public class ToonInfo extends ObjectMetaInfo{
+public class ToonInfo extends ObjectMetaInfo {
 
     long toonId; //if -1, it means that id wasn't allocated.
     String name;
-    IDGenerator id_generator;
-    IDGenerator update_id_generator;
+    IDGenerator idGenerator;
 
-    public long GenerateID() {
-        return id_generator.generate_id();
-    }
-
-    public long GenerateUpdateID() {
-        return update_id_generator.generate_id();
+    public BigInteger generateID() {
+        return idGenerator.generateId();
     }
 
     public ToonInfo() {
+        super(BigInteger.ZERO);
         toonId = -1;
-        id_generator = new IDGenerator();
-        update_id_generator = new IDGenerator();
+        idGenerator = new IDGenerator();
     }
 }

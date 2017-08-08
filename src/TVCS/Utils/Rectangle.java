@@ -96,4 +96,28 @@ public class Rectangle implements Serializable {
             coord.y = endY;
         }
     }
+
+    public void setWithSize(double startX, double startY, double width, double height) {
+        if (width >= 0 && height >= 0) {
+            this.width = width;
+            this.height = height;
+            this.coord.x = startX;
+            this.coord.y = startY;
+        } else if (width < 0 && height >= 0) {
+            this.width = -width;
+            this.height = height;
+            this.coord.x = startX + width;
+            this.coord.y = startY;
+        } else if (width >= 0 && height < 0) {
+            this.width = width;
+            this.height = -height;
+            this.coord.x = startX;
+            this.coord.y = startY + height;
+        } else {
+            this.width = -width;
+            this.height = -height;
+            this.coord.x = startX + width;
+            this.coord.y = startY + height;
+        }
+    }
 }

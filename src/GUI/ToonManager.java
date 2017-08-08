@@ -104,7 +104,7 @@ public class ToonManager {
     }
 
     private void addEpisode(Episode episode) {
-        EpisodeManager newEpisodeManager = new EpisodeManager(episode);
+        EpisodeManager newEpisodeManager = new EpisodeManager(episode, this);
         newEpisodeManager.start(centerPane);
         episodeManagers.add(newEpisodeManager);
         if(episodeManagers.size() == 1) {
@@ -232,6 +232,4 @@ public class ToonManager {
         centerContainerPane.setCenter(centerPane);
     }
 
-
-    //TODO When there become no episode, we have to remove some buttons
 }

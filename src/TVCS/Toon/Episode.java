@@ -1,21 +1,19 @@
 package TVCS.Toon;
 
-import TVCS.Toon.Branch.Branch;
-import TVCS.Toon.EpisodeTree.EpisodeTree;
 import TVCS.Utils.FileManager;
 import TVCS.Utils.Rectangle;
-import javafx.scene.image.*;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.math.BigInteger;
 import java.util.ArrayList;
 
 /**
  * Created by ina on 2017-06-02.
  */
-public class Episode implements Serializable{
+public class Episode implements Serializable {
     //TODO 최근 Push / Pull 후 변동사항이 있는가?
     //TODO 최근 Save 이후로 변동사항이 있는가?
     public static int DEFAULT_WIDTH = 500;
@@ -25,40 +23,41 @@ public class Episode implements Serializable{
     public static int MIN_HEIGHT = 500;
     public static int MAX_HEIGHT = 10000;
 
-    transient Toon parent_toon;
-
+    transient Toon parentToon;
 
     // This is saved with EpisodeTree
     public transient EpisodeInfo episodeInfo;
 
     public ArrayList<Cut> cuts;
 
-    public Episode(Toon parent_toon, String name) {
-        this.parent_toon = parent_toon;
-        this.episodeInfo = new EpisodeInfo(name, parent_toon.GenerateID(), DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    public Episode(Toon parentToon, String name) {
+        this.parentToon = parentToon;
+        this.episodeInfo = new EpisodeInfo(name, parentToon.generateID(), DEFAULT_WIDTH, DEFAULT_HEIGHT);
         this.cuts = new ArrayList<Cut>();
+        updated();
     }
 
     public boolean MakeNewEpisode() {
-        //TODO 이미 있는 scene인지 검사
+        //TODO 이미 있는 episode인지 검사
         return true;
     }
 
     public void resizeWidth(int width) {
         episodeInfo.width = width;
     }
+
     public void resizeHeight(int height) {
         episodeInfo.height = height;
     }
 
     public Cut AddNewCut(double x, double y, int width, int height) {
-        Rectangle new_cut_rect = new Rectangle(x, y, width, height);
-        if(!ConfirmAddRect(new_cut_rect)){
+        Rectangle newCutRect = new Rectangle(x, y, width, height);
+        if(!ConfirmAddRect(newCutRect)){
             return null;
         }
-        Cut new_cut = new Cut(parent_toon, this, new_cut_rect);
-        cuts.add(new_cut);
-        return new_cut;
+        Cut newCut = new Cut(parentToon, this, newCutRect);
+        cuts.add(newCut);
+        return newCut;
     }
 
     private boolean ConfirmAddRect(Rectangle rectangle){
@@ -79,7 +78,7 @@ public class Episode implements Serializable{
         }
     }
 
-    public long Id(){
+    public BigInteger Id(){
         return episodeInfo.id;
     }
 
@@ -121,14 +120,14 @@ public class Episode implements Serializable{
     }
 
     private void Loadtransient(Toon parent_toon) {
-        this.parent_toon = parent_toon;
+        this.parentToon = parent_toon;
         for(Cut cut : cuts) {
             cut.Loadtransient(parent_toon, this);
         }
     }
 
     public String sceneDirPath() {
-        return parent_toon.toonPath() + File.separator + episodeInfo.name;
+        return parentToon.toonPath() + File.separator + episodeInfo.name;
     }
 
     public String sceneInfoPath() {
@@ -148,5 +147,10 @@ public class Episode implements Serializable{
             cut.DrawLatestImage(scene_graphics);
         }
         return merged_scene;
+    }
+
+    public void updated() {
+        episodeInfo.updated = true;
+        parentToon.updated();
     }
 }

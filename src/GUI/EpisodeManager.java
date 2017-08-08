@@ -1,26 +1,24 @@
 package GUI;
 
+import TVCS.Toon.Cut;
 import TVCS.Toon.Episode;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.input.DragEvent;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
-import java.io.File;
 import java.util.ArrayList;
 
 /**
  * Created by ina on 2017-06-26.
  */
 public class EpisodeManager {
+    ToonManager parentToonManager;
+
     Episode episode;
     EpisodeTab tab;
     ScrollPane pane = new ScrollPane();
@@ -28,15 +26,29 @@ public class EpisodeManager {
     ArrayList<CutManager> cutManagers = new ArrayList<>();
 
     boolean addingCut = false;
+    CutManager selectedCut = null; // if null, nothing selected
+
+    //drag related events
     EventHandler<MouseEvent> pressHandler;
     EventHandler<MouseEvent> dragHandler;
     EventHandler<MouseEvent> releaseHandler;
 
+    EventHandler<MouseEvent> unselectCutHandeler = makeUnselectCutHandler();
 
 
-    public EpisodeManager(Episode episode) {
+    public EpisodeManager(Episode episode, ToonManager parentToonManager) {
         this.episode = episode;
+        this.parentToonManager = parentToonManager;
+        loadCut();
         tab = new EpisodeTab(this);
+    }
+
+    private void loadCut() {
+        for (Cut cut: episode.cuts) {
+            CutManager newCutManager = new CutManager(cut, this);
+            cutManagers.add(newCutManager);
+            newCutManager.setUp();
+        }
     }
 
     public void start(TabPane tabPane) {
@@ -52,8 +64,8 @@ public class EpisodeManager {
     }
 
     public void resizeHeight(int height) {
-        workPane.setMinWidth(height);
-        workPane.setMaxWidth(height);
+        workPane.setMinHeight(height);
+        workPane.setMaxHeight(height);
         episode.resizeHeight(height);
     }
 
@@ -67,6 +79,22 @@ public class EpisodeManager {
         pressHandler = makePressEventHandler();
         releaseHandler = makeReleaseHandler();
         workPane.addEventHandler(MouseEvent.MOUSE_PRESSED, pressHandler);
+    }
+
+    public void selectCut(CutManager cutManager) {
+        selectedCut = cutManager;
+        selectedCut.select();
+        workPane.addEventHandler(MouseEvent.MOUSE_CLICKED, unselectCutHandeler);
+        parentToonManager.rightPane.fillCutRelatedPane(cutManager.makePreserveRatioButton());
+    }
+
+    public void unselect() {
+        if (selectedCut == null) {
+            return;
+        }
+        workPane.removeEventHandler(MouseEvent.MOUSE_CLICKED, unselectCutHandeler);
+        selectedCut.unselect();
+        parentToonManager.rightPane.clearCutRelatedPane();
     }
 
     private void constructTab() {
@@ -85,11 +113,12 @@ public class EpisodeManager {
     }
 
     private EventHandler<MouseEvent> makePressEventHandler() {
+        EpisodeManager thisEpisodeManager = this;
         return new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 cutManagers.add(new CutManager(
-                        episode.AddNewCut(event.getX(), event.getY(), 0, 0), workPane));
+                        episode.AddNewCut(event.getX(), event.getY(), 0, 0), thisEpisodeManager));
                 workPane.addEventHandler(MouseEvent.MOUSE_DRAGGED, dragHandler);
                 workPane.addEventHandler(MouseEvent.MOUSE_RELEASED, releaseHandler);
             }
@@ -113,12 +142,21 @@ public class EpisodeManager {
                 CutManager cutManager = cutManagers.get(cutManagers.size() - 1);
                 cutManager.setUp();
                 addingCut = false;
-                removeHandlers();
+                removeDragHandlers();
             }
         };
     }
 
-    private void removeHandlers() {
+    private EventHandler<MouseEvent> makeUnselectCutHandler() {
+        return new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                unselect();
+            }
+        };
+    }
+
+    private void removeDragHandlers() {
         workPane.removeEventHandler(MouseEvent.MOUSE_PRESSED, pressHandler);
         workPane.removeEventHandler(MouseEvent.MOUSE_DRAGGED, dragHandler);
         workPane.removeEventHandler(MouseEvent.MOUSE_RELEASED, releaseHandler);

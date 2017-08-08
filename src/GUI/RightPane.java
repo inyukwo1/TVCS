@@ -15,9 +15,10 @@ public class RightPane {
     //TODO 예쁘게 디자인
     private static int WIDTH = 250;
 
-    BorderPane container = new BorderPane();
+    VBox container = new VBox();
     GridPane toonRelatedPane = new GridPane();
     GridPane episodeRelatedPane = new GridPane();
+    GridPane cutRelatedPane = new GridPane();
 
     Slider widthSlider;
     Slider heightSlider;
@@ -26,11 +27,13 @@ public class RightPane {
         setupContainer();
         setupToonRelatedPane();
         setupEpisodeRelatedPane();
+        setupCutRelatedPane();
     }
 
     private void setupContainer() {
-        container.setTop(toonRelatedPane);
-        container.setCenter(episodeRelatedPane);
+        container.getChildren().add(toonRelatedPane);
+        container.getChildren().add(episodeRelatedPane);
+        container.getChildren().add(cutRelatedPane);
         container.setMaxWidth(WIDTH);
         container.setMinWidth(WIDTH);
         container.setBorder(new Border(new BorderStroke(Color.GRAY, Color.GRAY, Color.GRAY, Color.GRAY,
@@ -41,7 +44,7 @@ public class RightPane {
 
     private void setupToonRelatedPane() {
         toonRelatedPane.setBorder(new Border(new BorderStroke(Color.GRAY, Color.GRAY, Color.GRAY, Color.GRAY,
-                BorderStrokeStyle.SOLID, BorderStrokeStyle.SOLID, BorderStrokeStyle.SOLID, BorderStrokeStyle.NONE,
+                BorderStrokeStyle.NONE, BorderStrokeStyle.NONE, BorderStrokeStyle.SOLID, BorderStrokeStyle.NONE,
                 CornerRadii.EMPTY, BorderWidths.DEFAULT, Insets.EMPTY)));
         toonRelatedPane.setPadding(new Insets(20));
         toonRelatedPane.setAlignment(Pos.CENTER);
@@ -49,9 +52,18 @@ public class RightPane {
 
     private void setupEpisodeRelatedPane() {
         episodeRelatedPane.setBorder(new Border(new BorderStroke(Color.GRAY, Color.GRAY, Color.GRAY, Color.GRAY,
-                BorderStrokeStyle.SOLID, BorderStrokeStyle.SOLID, BorderStrokeStyle.SOLID, BorderStrokeStyle.NONE,
+                BorderStrokeStyle.NONE, BorderStrokeStyle.NONE, BorderStrokeStyle.SOLID, BorderStrokeStyle.NONE,
                 CornerRadii.EMPTY, BorderWidths.DEFAULT, Insets.EMPTY)));
+        episodeRelatedPane.setPadding(new Insets(10));
         episodeRelatedPane.setAlignment(Pos.CENTER);
+    }
+
+    private void setupCutRelatedPane() {
+        cutRelatedPane.setBorder(new Border(new BorderStroke(Color.GRAY, Color.GRAY, Color.GRAY, Color.GRAY,
+                BorderStrokeStyle.NONE, BorderStrokeStyle.NONE, BorderStrokeStyle.SOLID, BorderStrokeStyle.NONE,
+                CornerRadii.EMPTY, BorderWidths.DEFAULT, Insets.EMPTY)));
+        cutRelatedPane.setPadding(new Insets(10));
+        cutRelatedPane.setAlignment(Pos.CENTER);
     }
 
     public void fillToonRelatedPane(Button episodeTreeShow, Button registerToon,
@@ -79,6 +91,14 @@ public class RightPane {
         episodeRelatedPane.add(pushEpisode, 0, 0);
         episodeRelatedPane.add(addNewCut, 0, 1);
         episodeRelatedPane.add(episodeSizeController, 0, 2);
+    }
+
+    public void fillCutRelatedPane(Button preserveRatioButton) {
+        cutRelatedPane.add(preserveRatioButton, 0, 0);
+    }
+
+    public void clearCutRelatedPane() {
+        cutRelatedPane.getChildren().clear();
     }
 }
 

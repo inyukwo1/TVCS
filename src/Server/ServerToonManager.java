@@ -5,6 +5,7 @@ import TVCS.Utils.FileManager;
 
 import java.io.File;
 import java.io.InputStream;
+import java.math.BigInteger;
 
 /**
  * Created by ina on 2017-06-12.
@@ -33,15 +34,15 @@ public class ServerToonManager {
         FileManager.SaveSerializableObject(episode, episodeInfoPath);
     }
 
-    public void readyToSaveCut(long cutId) {
-        this.cutPath = episodePath + File.separator + cutId;
+    public void readyToSaveCut(BigInteger cutId) {
+        this.cutPath = episodePath + File.separator + cutId.toString();
         if (!FileManager.PathExists(cutPath)) {
             FileManager.MakeDirectory(cutPath);
         }
     }
 
-    public void pullAndSaveImage(long imageId, InputStream inputStream) {
-        String imagePath = cutPath + File.separator + imageId + ".png";
+    public void pullAndSaveImage(BigInteger imageId, InputStream inputStream) {
+        String imagePath = cutPath + File.separator + imageId.toString() + ".png";
         FileManager.smallFilePull(imagePath, inputStream);
     }
 

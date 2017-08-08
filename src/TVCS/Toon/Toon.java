@@ -1,8 +1,6 @@
 package TVCS.Toon;
 
-import GUI.EpisodeTree.EpisodeTreeContent;
 import GUI.EpisodeTree.EpisodeTreePane;
-import TVCS.Toon.Branch.Branch;
 import TVCS.Toon.EpisodeTree.EpisodeTree;
 import TVCS.Toon.EpisodeTree.EpisodeVertex;
 import TVCS.Toon.EpisodeTree.EpisodeVertexBase;
@@ -10,6 +8,7 @@ import TVCS.Utils.DiscreteLocation;
 import TVCS.Utils.FileManager;
 
 import java.io.*;
+import java.math.BigInteger;
 import java.util.ArrayList;
 
 /**
@@ -36,12 +35,8 @@ public class Toon {
         loadedEplisodes = new ArrayList<Episode>();
     }
 
-    public long GenerateID() {
-        return toon_info.GenerateID();
-    }
-
-    public long GenerateUpdateID() {
-        return toon_info.GenerateUpdateID();
+    public BigInteger generateID() {
+        return toon_info.generateID();
     }
 
     public boolean MakeNewToon(){
@@ -146,5 +141,9 @@ public class Toon {
         for (Episode episode : loadedEplisodes) {
             episode.Save();
         }
+    }
+
+    public void updated() {
+        toon_info.updated = true;
     }
 }

@@ -1,15 +1,14 @@
 package TVCS.Toon;
 
 import TVCS.Utils.FileManager;
-import TVCS.Utils.ToonPoint;
 import TVCS.Utils.Rectangle;
-import javafx.scene.image.*;
 import javafx.scene.image.Image;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.util.ArrayList;
 
 /**
@@ -17,34 +16,35 @@ import java.util.ArrayList;
  */
 public class Cut implements Serializable{
     transient Toon parentToon;
-    transient Episode parentScene;
+    transient Episode parentEpisode;
 
     CutInfo cutInfo;
 
     public ArrayList<CutImage> images;
 
-    public Cut(Toon parentToon, Episode parentScene, Rectangle rectangle) {
+    public Cut(Toon parentToon, Episode parentEpisode, Rectangle rectangle) {
         this.parentToon = parentToon;
-        this.parentScene = parentScene;
-        long id = parentToon.GenerateID();
-        this.cutInfo = new CutInfo(id , rectangle, false);
+        this.parentEpisode = parentEpisode;
+        this.cutInfo = new CutInfo(parentToon.generateID(), rectangle, false);
         this.images = new ArrayList<>();
+        updated();
     }
 
     public void moveRectangle(Rectangle rectangle) {
         cutInfo.rectangle = rectangle;
     }
 
-    public ToonPoint cutPoint() {
-        return cutInfo.rectangle.LeftTopCoord();
+    public Rectangle cutRectangle() {
+        return cutInfo.rectangle;
     }
 
     public boolean AddImage(String image_path) {
-        CutImage new_image = new CutImage(parentToon, parentScene, this);
+        CutImage new_image = new CutImage(parentToon, parentEpisode, this);
         if(!new_image.LoadImage(image_path)) {
             return false;
         }
         images.add(new_image);
+        updated();
         return true;
     }
 
@@ -66,7 +66,7 @@ public class Cut implements Serializable{
         return new AffineTransform(m00, m10, m01, m11, m02, m12);
     }
 
-    public long id() {
+    public BigInteger id() {
         return cutInfo.id;
     }
 
@@ -83,17 +83,34 @@ public class Cut implements Serializable{
 
     public void Loadtransient(Toon parentToon, Episode parentScene) {
         this.parentToon = parentToon;
-        this.parentScene = parentScene;
+        this.parentEpisode = parentScene;
         for(CutImage image: images) {
             image.Loadtransient(parentToon, parentScene, this);
         }
     }
 
     public String cutDirPath() {
-        return parentScene.sceneDirPath() + File.separator + cutInfo.id;
+        return parentEpisode.sceneDirPath() + File.separator + cutInfo.id;
+    }
+
+    public boolean hasImage() {
+        return images.size() > 0;
     }
 
     public Image currentImage() {
         return images.get(images.size() - 1).fxImage();
+    }
+
+    public void updated() {
+        cutInfo.updated = true;
+        parentEpisode.updated();
+    }
+
+    public boolean preserveRatio() {
+        return cutInfo.preserveRatio;
+    }
+
+    public void changePreserveRatio() {
+        cutInfo.preserveRatio = !cutInfo.preserveRatio;
     }
 }

@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.math.BigInteger;
 
 /**
  * Created by ina on 2017-06-02.
@@ -28,10 +29,10 @@ public class CutImage implements Serializable {
         this.parentScene = parentScene;
         this.parentCut = parentCut;
 
-
-        long id = parentToon.GenerateID();
-        cutImageInfo = new CutImageInfo(id, parentToon.GenerateUpdateID());
+        cutImageInfo = new CutImageInfo(parentToon.generateID());
+        updated();
     }
+
     public boolean LoadImage(String image_path) {
         try {
             image = ImageIO.read(new File(image_path));
@@ -60,7 +61,7 @@ public class CutImage implements Serializable {
         }
     }
 
-    public long id() {
+    public BigInteger id() {
         return cutImageInfo.id;
     }
 
@@ -81,5 +82,10 @@ public class CutImage implements Serializable {
 
     public Image fxImage() {
         return SwingFXUtils.toFXImage(image, null);
+    }
+
+    public void updated() {
+        cutImageInfo.updated = true;
+        parentCut.updated();
     }
 }

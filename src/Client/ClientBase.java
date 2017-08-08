@@ -26,7 +26,6 @@ public class ClientBase {
 
     long toonId;
 
-
     public ClientBase(String ip, int port, long toonId) {
         try {
             socket = getSocket(ip, port);
@@ -102,7 +101,7 @@ public class ClientBase {
     }
 
     private void pushCut(Cut cut) throws IOException {
-        dataOutputStream.writeLong(cut.id());
+        dataOutputStream.writeUTF(cut.id().toString());
         dataOutputStream.writeInt(cut.imageNum());
         for(CutImage image : cut.images) {
             pushImage(image);
@@ -110,7 +109,7 @@ public class ClientBase {
     }
 
     private void pushImage(CutImage image) throws IOException {
-        dataOutputStream.writeLong(image.id());
+        dataOutputStream.writeUTF(image.id().toString());
         FileManager.smallFilePush(image.cutImagePath(), outputStream);
     }
 

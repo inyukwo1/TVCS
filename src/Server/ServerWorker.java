@@ -4,6 +4,7 @@ import Client.CommunicationType;
 import TVCS.Toon.Episode;
 
 import java.io.*;
+import java.math.BigInteger;
 import java.net.Socket;
 
 /**
@@ -125,7 +126,7 @@ public class ServerWorker implements Runnable {
     }
 
     private void receiveAndSaveCut() throws IOException {
-        long cutId = dataInputStream.readLong();
+        BigInteger cutId = new BigInteger(dataInputStream.readUTF());
         int numImages = dataInputStream.readInt();
         serverToonManager.readyToSaveCut(cutId);
         for (int i = 0 ; i < numImages ; i++) {
@@ -133,8 +134,8 @@ public class ServerWorker implements Runnable {
         }
     }
 
-    private void receiveAndSaveImage(long cutId) throws IOException {
-        long imageId = dataInputStream.readLong();
+    private void receiveAndSaveImage(BigInteger cutId) throws IOException {
+        BigInteger imageId = new BigInteger(dataInputStream.readUTF());
         serverToonManager.pullAndSaveImage(imageId, inputStream);
     }
 }
