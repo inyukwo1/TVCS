@@ -1,9 +1,7 @@
 package GUI;
 
 import GUI.EpisodeTree.EpisodeTreeManager;
-import GUI.Utils.IntField;
 import TVCS.Toon.Episode;
-import TVCS.Toon.EpisodeInfo;
 import TVCS.Toon.EpisodeTree.EpisodeVertex;
 import TVCS.Toon.Toon;
 import TVCS.Utils.DiscreteLocation;
@@ -37,12 +35,18 @@ public class ToonManager {
     RightPane rightPane = new RightPane();
 
     Button addNewCutButton;
+    Button extractButton;
+    GridPane backgroundColorController;
+    GridPane episodeSizeController;
 
     public ToonManager(Toon toon) {
         this.toon = toon;
         this.pushManager = new PushManager(toon);
         this.episodeTreeManager = new EpisodeTreeManager(toon.getEpisodeTree(), centerContainerPane);
         this.addNewCutButton = makeAddNewCutButton();
+        this.extractButton = makeExtractButton();
+        this.backgroundColorController = makeBackgroundColorController();
+        this.episodeSizeController = makeEpisodeSizeController();
         setTabChangeListener();
     }
 
@@ -160,7 +164,7 @@ public class ToonManager {
     private void whenFirstEpisodeMade() {
         // TODO 에피소드가 하나도 안남게 되었을 때 이거 삭제하는거 구현
         rightPane.fillEpisodeRelatedPane(pushManager.getPushEpisodeButton(),
-                addNewCutButton, makeEpisodeSizeController());
+                extractButton, addNewCutButton, backgroundColorController, episodeSizeController);
     }
 
     private Button makeNewEpisodeButton() {
@@ -176,14 +180,45 @@ public class ToonManager {
     }
 
     private Button makeAddNewCutButton() {
-        Button newSceneButton = new Button("Add New Cut");
-        newSceneButton.setOnAction(new EventHandler<ActionEvent>() {
+        Button newCutButton = new Button("Add New Cut");
+        newCutButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 selectedEpisodeManager().startAddCutMode();
             }
         });
-        return newSceneButton;
+        return newCutButton;
+    }
+
+    private Button makeExtractButton() {
+        Button extractButton = new Button("Extract");
+        extractButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                selectedEpisodeManager().extract();
+            }
+        });
+        return extractButton;
+    }
+
+    private GridPane makeBackgroundColorController() {
+        GridPane backgroundColorController = new GridPane();
+        Label backgroundColorLabel = new Label("Background Color: ");
+        ColorPicker backgroundColorPicker = new ColorPicker();
+
+        backgroundColorPicker.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                selectedEpisodeManager().setBackgroundColor(backgroundColorPicker.getValue());
+            }
+        });
+
+        backgroundColorController.add(backgroundColorLabel, 0, 0);
+        backgroundColorController.add(backgroundColorPicker, 1, 0);
+
+
+
+        return backgroundColorController;
     }
 
     private GridPane makeEpisodeSizeController() {

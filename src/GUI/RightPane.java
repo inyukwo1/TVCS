@@ -4,6 +4,7 @@ import TVCS.Toon.Episode;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -46,7 +47,7 @@ public class RightPane {
         toonRelatedPane.setBorder(new Border(new BorderStroke(Color.GRAY, Color.GRAY, Color.GRAY, Color.GRAY,
                 BorderStrokeStyle.NONE, BorderStrokeStyle.NONE, BorderStrokeStyle.SOLID, BorderStrokeStyle.NONE,
                 CornerRadii.EMPTY, BorderWidths.DEFAULT, Insets.EMPTY)));
-        toonRelatedPane.setPadding(new Insets(20));
+        toonRelatedPane.setPadding(new Insets(10));
         toonRelatedPane.setAlignment(Pos.CENTER);
     }
 
@@ -87,10 +88,13 @@ public class RightPane {
         heightSlider.setValue(episode.getHeight());
     }
 
-    public void fillEpisodeRelatedPane(Button pushEpisode, Button addNewCut, GridPane episodeSizeController) {
+    public void fillEpisodeRelatedPane(Button pushEpisode, Button addNewCut, Button extractPdf,
+                                       GridPane backgroudColorController, GridPane episodeSizeController) {
         episodeRelatedPane.add(pushEpisode, 0, 0);
         episodeRelatedPane.add(addNewCut, 0, 1);
-        episodeRelatedPane.add(episodeSizeController, 0, 2);
+        episodeRelatedPane.add(extractPdf, 0, 2);
+        episodeRelatedPane.add(backgroudColorController, 0, 3);
+        episodeRelatedPane.add(episodeSizeController, 0, 4);
     }
 
     public void fillCutRelatedPane(Button preserveRatioButton) {

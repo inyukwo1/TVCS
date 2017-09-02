@@ -1,6 +1,7 @@
 package TVCS.Toon;
 
 import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
 import javafx.util.Pair;
 
 import java.math.BigInteger;
@@ -11,6 +12,7 @@ import java.math.BigInteger;
 public class EpisodeInfo extends ObjectMetaInfo {
     public String name;
     public int width, height;
+    public Color backgroundColor;
 
     public Image thumbnail; //TODO 저장, 로드, push, pull 등
     public Pair<Integer, Integer> episodeTreePaneLocation;
@@ -20,5 +22,6 @@ public class EpisodeInfo extends ObjectMetaInfo {
         this.name = name;
         this.width = width;
         this.height = height;
+        this.backgroundColor = Color.WHITE;
     }
 }

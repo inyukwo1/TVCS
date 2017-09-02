@@ -2,9 +2,11 @@ package TVCS.Toon;
 
 import TVCS.Utils.FileManager;
 import TVCS.Utils.Rectangle;
+import javafx.scene.paint.*;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.math.BigInteger;
@@ -69,10 +71,10 @@ public class Episode implements Serializable {
         return true;
     }
 
-    public void Export(String export_path) {
+    public void extract(String export_path, String formatName) {
         try {
             BufferedImage merged_scene = MergeScene();
-            ImageIO.write(merged_scene, "jpg", new File(export_path));
+            ImageIO.write(merged_scene, formatName, new File(export_path));
         } catch (IOException e) {
             System.out.println("File Making Failed");
         }
@@ -139,14 +141,27 @@ public class Episode implements Serializable {
         return false;
     }
 
+    public void setBackgroundColor(javafx.scene.paint.Color color) {
+        episodeInfo.backgroundColor = color;
+    }
+
     private BufferedImage MergeScene(){
-        BufferedImage merged_scene = new BufferedImage(episodeInfo.width, episodeInfo.height, BufferedImage.TYPE_INT_RGB);
-        Graphics2D scene_graphics = (Graphics2D) merged_scene.getGraphics();
-        scene_graphics.setBackground(Color.WHITE); //TODO
+        BufferedImage mergedScene = new BufferedImage(episodeInfo.width, episodeInfo.height, BufferedImage.TYPE_INT_RGB);
+        Graphics2D sceneGraphics = mergedScene.createGraphics();
+        sceneGraphics.setPaint(getAwtBackgroundColor());
+        sceneGraphics.fillRect(0, 0, episodeInfo.width, episodeInfo.height);
         for(Cut cut : cuts) {
-            cut.DrawLatestImage(scene_graphics);
+            cut.DrawLatestImage(sceneGraphics);
         }
-        return merged_scene;
+        return mergedScene;
+    }
+
+    private Color getAwtBackgroundColor() {
+        Color awtColor = new java.awt.Color((float) episodeInfo.backgroundColor.getRed(),
+                (float) episodeInfo.backgroundColor.getGreen(),
+                (float) episodeInfo.backgroundColor.getBlue(),
+                (float) episodeInfo.backgroundColor.getOpacity());
+        return awtColor;
     }
 
     public void updated() {

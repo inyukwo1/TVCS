@@ -52,16 +52,30 @@ public class Cut implements Serializable{
         if(images.size() == 0) {
             return;
         }
-        CutImage latest_image = images.get(images.size()-1);
+        CutImage latest_image = images.get(images.size() - 1);
         scene_graphics.drawImage(latest_image.image, GetAffineTransform(latest_image), null);
     }
+
     public AffineTransform GetAffineTransform(CutImage image) {
-        double m00 = (double) cutInfo.rectangle.width / (double)image.Width();
-        double m10 = (double) 0;
-        double m01 = (double) 0;
-        double m11 = (double) cutInfo.rectangle.height / (double)image.Height();
-        double m02 = (double) cutInfo.rectangle.LeftTopCoord().x;
-        double m12 = (double) cutInfo.rectangle.LeftTopCoord().y;
+        double m00, m10, m01, m11, m02, m12;
+        if (!cutInfo.preserveRatio) {
+            m00 = (double) cutInfo.rectangle.width / (double) image.Width();
+            m10 = (double) 0;
+            m01 = (double) 0;
+            m11 = (double) cutInfo.rectangle.height / (double) image.Height();
+            m02 = (double) cutInfo.rectangle.LeftTopCoord().x;
+            m12 = (double) cutInfo.rectangle.LeftTopCoord().y;
+        } else {
+            double widthRatio = cutInfo.rectangle.width / (double) image.Width();
+            double heightRatio = cutInfo.rectangle.height / (double) image.Height();
+            double ratio = widthRatio > heightRatio ? heightRatio : widthRatio;
+            m00 = (double) ratio;
+            m10 = (double) 0;
+            m01 = (double) 0;
+            m11 = (double) ratio;
+            m02 = (double) cutInfo.rectangle.LeftTopCoord().x;
+            m12 = (double) cutInfo.rectangle.LeftTopCoord().y;
+        }
 
         return new AffineTransform(m00, m10, m01, m11, m02, m12);
     }

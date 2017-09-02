@@ -9,7 +9,7 @@ import java.util.LinkedList;
 /**
  * Created by ina on 2017-07-21.
  */
-public class SetPane extends EpisodeTreePane{
+public class SetPane extends EpisodeTreePane {
 
     public void setPaneSize() {
         pane.setMaxWidth(paneWidth() * EpisodeTreeContent.CONTENT_BLOCK_WIDTH());

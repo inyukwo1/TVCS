@@ -35,6 +35,7 @@ public class EpisodeManager {
 
     EventHandler<MouseEvent> unselectCutHandeler = makeUnselectCutHandler();
 
+    Extractor extractor = new Extractor();
 
     public EpisodeManager(Episode episode, ToonManager parentToonManager) {
         this.episode = episode;
@@ -95,6 +96,15 @@ public class EpisodeManager {
         workPane.removeEventHandler(MouseEvent.MOUSE_CLICKED, unselectCutHandeler);
         selectedCut.unselect();
         parentToonManager.rightPane.clearCutRelatedPane();
+    }
+
+    public void extract() {
+        extractor.extract(this.episode);
+    }
+
+    public void setBackgroundColor(Color color) {
+        episode.setBackgroundColor(color);
+        workPane.setBackground(new Background(new BackgroundFill(color, CornerRadii.EMPTY, Insets.EMPTY)));
     }
 
     private void constructTab() {
