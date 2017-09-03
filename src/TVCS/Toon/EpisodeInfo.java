@@ -12,6 +12,7 @@ import java.math.BigInteger;
 public class EpisodeInfo extends ObjectMetaInfo {
     public String name;
     public int width, height;
+    public int gridSize;
     public Color backgroundColor;
 
     public Image thumbnail; //TODO 저장, 로드, push, pull 등
@@ -22,6 +23,7 @@ public class EpisodeInfo extends ObjectMetaInfo {
         this.name = name;
         this.width = width;
         this.height = height;
+        this.gridSize = Episode.DEFAULT_GRID;
         this.backgroundColor = Color.WHITE;
     }
 }

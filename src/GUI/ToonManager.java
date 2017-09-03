@@ -38,6 +38,7 @@ public class ToonManager {
     Button extractButton;
     GridPane backgroundColorController;
     GridPane episodeSizeController;
+    GridPane gridSizeController;
 
     public ToonManager(Toon toon) {
         this.toon = toon;
@@ -47,6 +48,7 @@ public class ToonManager {
         this.extractButton = makeExtractButton();
         this.backgroundColorController = makeBackgroundColorController();
         this.episodeSizeController = makeEpisodeSizeController();
+        this.gridSizeController = makeGridSizeController();
         setTabChangeListener();
     }
 
@@ -164,7 +166,8 @@ public class ToonManager {
     private void whenFirstEpisodeMade() {
         // TODO 에피소드가 하나도 안남게 되었을 때 이거 삭제하는거 구현
         rightPane.fillEpisodeRelatedPane(pushManager.getPushEpisodeButton(),
-                extractButton, addNewCutButton, backgroundColorController, episodeSizeController);
+                extractButton, addNewCutButton, backgroundColorController,
+                episodeSizeController, gridSizeController);
     }
 
     private Button makeNewEpisodeButton() {
@@ -259,6 +262,29 @@ public class ToonManager {
         rightPane.setWidthSlider(widthSlider);
         rightPane.setHeightSlider(heightSlider);
         return episodeSizeController;
+    }
+
+    private GridPane makeGridSizeController() {
+        GridPane gridSizeController = new GridPane();
+        Label gridLabel = new Label("Grid: ");
+        gridLabel.setMinWidth(50);
+        gridLabel.setMinWidth(50);
+        Slider gridSlider = new Slider(Episode.MIN_GRID, Episode.MAX_GRID, Episode.DEFAULT_GRID);
+        Label gridValue = new Label(Integer.toString((int) gridSlider.getValue()));
+        gridSlider.valueProperty().addListener(
+                (ObservableValue<? extends Number> ov, Number oldValue, Number newValue) -> {
+                    int newGrid = newValue.intValue();
+                    selectedEpisodeManager().resizeGrid(newGrid);
+                    gridValue.setText(((Integer) newGrid).toString());
+                }
+        );
+
+        gridSizeController.add(gridLabel, 0, 0);
+        gridSizeController.add(gridSlider, 1, 0);
+        gridSizeController.add(gridValue, 2, 0);
+
+        rightPane.setWidthSlider(gridSlider);
+        return gridSizeController;
     }
 
     private void addCenterPane() {

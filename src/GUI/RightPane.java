@@ -89,12 +89,14 @@ public class RightPane {
     }
 
     public void fillEpisodeRelatedPane(Button pushEpisode, Button addNewCut, Button extractPdf,
-                                       GridPane backgroudColorController, GridPane episodeSizeController) {
+                                       GridPane backgroudColorController, GridPane episodeSizeController,
+                                       GridPane gridSizeController) {
         episodeRelatedPane.add(pushEpisode, 0, 0);
         episodeRelatedPane.add(addNewCut, 0, 1);
         episodeRelatedPane.add(extractPdf, 0, 2);
         episodeRelatedPane.add(backgroudColorController, 0, 3);
         episodeRelatedPane.add(episodeSizeController, 0, 4);
+        episodeRelatedPane.add(gridSizeController, 0, 5);
     }
 
     public void fillCutRelatedPane(Button preserveRatioButton) {

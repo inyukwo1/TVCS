@@ -24,6 +24,9 @@ public class Episode implements Serializable {
     public static int DEFAULT_HEIGHT = 3000;
     public static int MIN_HEIGHT = 500;
     public static int MAX_HEIGHT = 10000;
+    public static int DEFAULT_GRID = 50;
+    public static int MIN_GRID = 10;
+    public static int MAX_GRID = 500;
 
     transient Toon parentToon;
 
@@ -96,6 +99,18 @@ public class Episode implements Serializable {
         return episodeInfo.height;
     }
 
+    public int getGridSize() {
+        return episodeInfo.gridSize;
+    }
+
+    public void setGridSize(int gridSize) {
+        episodeInfo.gridSize = gridSize;
+    }
+
+    public javafx.scene.paint.Color getBackgroundColor() {
+        return episodeInfo.backgroundColor;
+    }
+
     public int numCuts() {
         return cuts.size();
     }
@@ -145,7 +160,7 @@ public class Episode implements Serializable {
         episodeInfo.backgroundColor = color;
     }
 
-    private BufferedImage MergeScene(){
+    private BufferedImage MergeScene() {
         BufferedImage mergedScene = new BufferedImage(episodeInfo.width, episodeInfo.height, BufferedImage.TYPE_INT_RGB);
         Graphics2D sceneGraphics = mergedScene.createGraphics();
         sceneGraphics.setPaint(getAwtBackgroundColor());
