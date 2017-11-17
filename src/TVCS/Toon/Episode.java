@@ -161,7 +161,7 @@ public class Episode implements Serializable {
     }
 
     private BufferedImage MergeScene() {
-        BufferedImage mergedScene = new BufferedImage(episodeInfo.width, episodeInfo.height, BufferedImage.TYPE_INT_RGB);
+        BufferedImage mergedScene = new BufferedImage(episodeInfo.width, episodeInfo.height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D sceneGraphics = mergedScene.createGraphics();
         sceneGraphics.setPaint(getAwtBackgroundColor());
         sceneGraphics.fillRect(0, 0, episodeInfo.width, episodeInfo.height);

@@ -141,11 +141,15 @@ public class EpisodeManager {
         addHorizontalGridLine(horizontalGridPosition, episode.getHeight(), gridSize);
 
         episode.setGridSize(gridSize);
+        for (CutManager cutManager : cutManagers) {
+            cutManager.parentGridSizeChanged();
+        }
     }
 
     private void addVerticalGridLine(int startX, int endX, int gridSize) {
         for (; startX < endX ; startX += gridSize) {
             Line verticalLine = new Line(startX, 0, startX, episode.getHeight());
+            verticalLine.setStrokeWidth(0.3);
             verticalLine.getStrokeDashArray().addAll(2d, 4d);
             gridVerticalLines.add(verticalLine);
             workPane.getChildren().add(verticalLine);
@@ -156,6 +160,7 @@ public class EpisodeManager {
     private void addHorizontalGridLine(int startY, int endY, int gridSize) {
         for (; startY < endY ; startY += gridSize) {
             Line horizontalLine = new Line(0, startY, episode.getWidth(), startY);
+            horizontalLine.setStrokeWidth(0.3);
             horizontalLine.getStrokeDashArray().addAll(2d, 4d);
             gridHorizontalLines.add(horizontalLine);
             workPane.getChildren().add(horizontalLine);
@@ -179,7 +184,9 @@ public class EpisodeManager {
         selectedCut = cutManager;
         selectedCut.select();
         workPane.addEventHandler(MouseEvent.MOUSE_CLICKED, unselectCutHandeler);
-        parentToonManager.rightPane.fillCutRelatedPane(cutManager.makePreserveRatioButton());
+        parentToonManager.rightPane.fillCutRelatedPane(
+                cutManager.makeShowLayersButton(),
+                cutManager.makePreserveRatioButton(), cutManager.makeFitToGridController());
     }
 
     public void unselect() {
@@ -222,6 +229,7 @@ public class EpisodeManager {
         for (int verticalGridPosition = episode.getGridSize() ;
              verticalGridPosition < episode.getWidth() ; verticalGridPosition += episode.getGridSize()) {
             Line verticalLine = new Line(verticalGridPosition, 0, verticalGridPosition, episode.getHeight());
+            verticalLine.setStrokeWidth(0.3);
             verticalLine.getStrokeDashArray().addAll(2d, 4d);
             gridVerticalLines.add(verticalLine);
             workPane.getChildren().add(verticalLine);
@@ -229,6 +237,7 @@ public class EpisodeManager {
         for (int horizontalGridPosition = episode.getGridSize() ;
              horizontalGridPosition < episode.getHeight() ; horizontalGridPosition += episode.getGridSize()) {
             Line horizontalLine = new Line(0, horizontalGridPosition, episode.getWidth(), horizontalGridPosition);
+            horizontalLine.setStrokeWidth(0.3);
             horizontalLine.getStrokeDashArray().addAll(2d, 4d);
             gridHorizontalLines.add(horizontalLine);
             workPane.getChildren().add(horizontalLine);

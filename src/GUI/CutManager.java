@@ -1,12 +1,19 @@
 package GUI;
 
 import TVCS.Toon.Cut;
+import TVCS.Toon.Episode;
+import TVCS.Utils.IntPair;
 import TVCS.WorkSpace;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Cursor;
-import javafx.scene.control.Button;
+import javafx.scene.Group;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
@@ -14,6 +21,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.io.File;
 
@@ -42,14 +52,17 @@ public class CutManager {
     EventHandler<MouseEvent> moveDragHandler;
     EventHandler<MouseEvent> moveReleaseHandler;
 
+    LayerManager layerManager;
+
     public CutManager(Cut cut, EpisodeManager parentEpisodeManager) {
         this.parentEpisodeManager = parentEpisodeManager;
         parentEpisodeManager.workPane.getChildren().add(cutContainer);
         this.cut = cut;
+        this.layerManager = new LayerManager(this);
         cutContainer.setLayoutX(cut.cutRectangle().leftPos());
         cutContainer.setLayoutY(cut.cutRectangle().topPos());
-        locX = cut.cutRectangle().leftPos();
-        locY = cut.cutRectangle().topPos();
+        locX = cut.cutRectangle().leftPos() - BORDER_WIDTH;
+        locY = cut.cutRectangle().topPos() - BORDER_WIDTH;
         cutContainer.getChildren().add(imageView);
         imageView.setPreserveRatio(cut.preserveRatio());
         setDefaultBorder();
@@ -67,7 +80,7 @@ public class CutManager {
     public void moveSize(double deltaWidth, double deltaHeight) {
         width += deltaWidth;
         height += deltaHeight;
-        cut.cutRectangle().setWithSize(locX, locY, width, height);
+        cut.cutRectangle().setWithSize(locX + BORDER_WIDTH, locY + BORDER_WIDTH, width - 2 * BORDER_WIDTH, height - 2 * BORDER_WIDTH);
         syncContainerLoc();
         resetImage();
     }
@@ -87,10 +100,10 @@ public class CutManager {
     }
 
     private void syncContainerLoc() {
-        cutContainer.setLayoutX(cut.cutRectangle().leftPos());
-        cutContainer.setLayoutY(cut.cutRectangle().topPos());
-        cutContainer.setMinSize(cut.cutRectangle().width, cut.cutRectangle().height);
-        cutContainer.setMaxSize(cut.cutRectangle().width, cut.cutRectangle().height);
+        cutContainer.setLayoutX(cut.cutRectangle().leftPos() - BORDER_WIDTH);
+        cutContainer.setLayoutY(cut.cutRectangle().topPos() - BORDER_WIDTH);
+        cutContainer.setMinSize(cut.cutRectangle().width + 2 * BORDER_WIDTH, cut.cutRectangle().height + 2 * BORDER_WIDTH);
+        cutContainer.setMaxSize(cut.cutRectangle().width+ 2 * BORDER_WIDTH, cut.cutRectangle().height+ 2 * BORDER_WIDTH);
     }
 
     public void unselect() {
@@ -104,6 +117,10 @@ public class CutManager {
         cutContainer.addEventHandler(MouseEvent.MOUSE_MOVED, mouseMoveHandler);
         cutContainer.addEventHandler(MouseEvent.MOUSE_EXITED,mouseExitHandler);
         cutContainer.addEventHandler(MouseEvent.MOUSE_PRESSED, mousePressHandler);
+    }
+
+    public Button makeShowLayersButton() {
+        return layerManager.showLayersButton;
     }
 
     public Button makePreserveRatioButton() {
@@ -126,6 +143,66 @@ public class CutManager {
             }
         });
         return fitContainerButton;
+    }
+
+    public void parentGridSizeChanged() {
+        if (!cut.getFitToGrid()) {
+            return;
+        }
+        cut.parentGridSizeChanged();
+        syncContainerLoc();
+    }
+
+    public GridPane makeFitToGridController() {
+        GridPane fitToGridController = new GridPane();
+
+        CheckBox offsetCheckBox = new CheckBox("GridFit: ");
+
+        Slider offsetSlider = new Slider(Cut.GRID_FIT_MIN_OFFSET, cut.parentGridSize(), cut.getGridOffset());
+        Label offsetValue = new Label(Integer.toString((int) offsetSlider.getValue()));
+
+        offsetCheckBox.setSelected(cut.getFitToGrid());
+        if (!cut.getFitToGrid()) {
+            offsetSlider.setDisable(true);
+            offsetValue.setDisable(true);
+        }
+        offsetCheckBox.selectedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if (newValue.equals(Boolean.FALSE)) {
+                    offsetSlider.setDisable(true);
+                    offsetValue.setDisable(true);
+                    cut.unfitToGrid();
+                } else {
+                    offsetSlider.setDisable(false);
+                    offsetValue.setDisable(false);
+                    IntPair leftTopGrid = new IntPair(
+                            (int)cut.cutRectangle().LeftTopCoord().x / cut.parentGridSize(),
+                            (int)cut.cutRectangle().LeftTopCoord().y / cut.parentGridSize());
+                    IntPair rightBottomGrid = new IntPair(
+                            (int)(cut.cutRectangle().RightBottomCoord().x) / cut.parentGridSize(),
+                            (int)cut.cutRectangle().RightBottomCoord().y / cut.parentGridSize());
+                    cut.fitToGrid(leftTopGrid, rightBottomGrid);
+                    syncContainerLoc();
+                    resetImage();
+                }
+            }
+        });
+        offsetSlider.valueProperty().addListener(
+                (ObservableValue<? extends Number> ov, Number oldValue, Number newValue) -> {
+                    int newGridOffset = newValue.intValue();
+                    cut.setGridOffset(newGridOffset);
+                    offsetValue.setText(((Integer) newGridOffset).toString());
+                    syncContainerLoc();
+                    resetImage();
+                }
+        );
+
+        fitToGridController.add(offsetCheckBox, 0, 0);
+        fitToGridController.add(offsetSlider, 1, 0);
+        fitToGridController.add(offsetValue, 2, 0);
+
+        return fitToGridController;
     }
 
     private void setSelectCutListener(EpisodeManager parentEpisodeManager) {
@@ -194,13 +271,13 @@ public class CutManager {
                 CornerRadii.EMPTY, new BorderWidths(BORDER_WIDTH), Insets.EMPTY)));
     }
 
-    private void resetImage() {
+    public void resetImage() {
         if (!cut.hasImage()) {
             return;
         }
         imageView.setImage(cut.currentImage());
-        imageView.setFitHeight(cut.cutRectangle().height - 2 * BORDER_WIDTH);
-        imageView.setFitWidth(cut.cutRectangle().width - 2 * BORDER_WIDTH);
+        imageView.setFitHeight(cut.cutRectangle().height);
+        imageView.setFitWidth(cut.cutRectangle().width);
     }
 
     private void setHandler() {

@@ -99,8 +99,10 @@ public class RightPane {
         episodeRelatedPane.add(gridSizeController, 0, 5);
     }
 
-    public void fillCutRelatedPane(Button preserveRatioButton) {
-        cutRelatedPane.add(preserveRatioButton, 0, 0);
+    public void fillCutRelatedPane(Button showLayersButton, Button preserveRatioButton, GridPane fitToGridController) {
+        cutRelatedPane.add(showLayersButton, 0, 0);
+        cutRelatedPane.add(preserveRatioButton, 0, 1);
+        cutRelatedPane.add(fitToGridController, 0, 2);
     }
 
     public void clearCutRelatedPane() {

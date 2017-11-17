@@ -11,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import org.opencv.core.Core;
 
 import java.io.IOException;
 
@@ -20,7 +21,7 @@ public class Main extends Application {
     private BorderPane rootPane;
     private MenuManager menuManager;
     public ToonManager toonManager = null;
-
+    static{ System.loadLibrary(Core.NATIVE_LIBRARY_NAME); }
     @Override
     public void start(Stage primaryStage) throws Exception{
         WorkSpace.mainApp = this;
@@ -75,6 +76,4 @@ public class Main extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-
-
 }
