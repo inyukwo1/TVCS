@@ -6,12 +6,12 @@ import java.io.Serializable;
  * Created by ina on 2017-06-05.
  */
 public class Rectangle implements Serializable {
-    public ToonPoint coord;
+    public TVCSPoint coord;
     public double width;
     public double height;
 
     public Rectangle(double x, double y, double width, double height) {
-        this.coord = new ToonPoint(x, y);
+        this.coord = new TVCSPoint(x, y);
         this.width = width;
         this.height = height;
     }
@@ -24,29 +24,29 @@ public class Rectangle implements Serializable {
         return coord.y;
     }
 
-    public ToonPoint LeftTopCoord() {
-        ToonPoint left_top_coord = new ToonPoint(coord.x, coord.y);
+    public TVCSPoint LeftTopCoord() {
+        TVCSPoint left_top_coord = new TVCSPoint(coord.x, coord.y);
         return left_top_coord;
     }
 
-    public ToonPoint LeftBottomCoord() {
-        ToonPoint left_bottom_coord = new ToonPoint(coord.x, coord.y + height -1);
+    public TVCSPoint LeftBottomCoord() {
+        TVCSPoint left_bottom_coord = new TVCSPoint(coord.x, coord.y + height -1);
         return left_bottom_coord;
     }
 
-    public ToonPoint RightTopCoord() {
-        ToonPoint right_top_coord = new ToonPoint(coord.x + width -1, coord.y);
+    public TVCSPoint RightTopCoord() {
+        TVCSPoint right_top_coord = new TVCSPoint(coord.x + width -1, coord.y);
         return right_top_coord;
     }
 
-    public ToonPoint RightBottomCoord() {
-        ToonPoint right_bottom_coord = new ToonPoint(coord.x + width -1, coord.y + height -1);
+    public TVCSPoint RightBottomCoord() {
+        TVCSPoint right_bottom_coord = new TVCSPoint(coord.x + width -1, coord.y + height -1);
         return right_bottom_coord;
     }
 
-    public boolean ContainsPoint(ToonPoint toonPoint) {
-        if(coord.x <= toonPoint.x && toonPoint.x < coord.x + width
-                && coord.y <= toonPoint.y && toonPoint.y <= coord.y + height) {
+    public boolean ContainsPoint(TVCSPoint TVCSPoint) {
+        if(coord.x <= TVCSPoint.x && TVCSPoint.x < coord.x + width
+                && coord.y <= TVCSPoint.y && TVCSPoint.y <= coord.y + height) {
             return true;
         }
         return false;

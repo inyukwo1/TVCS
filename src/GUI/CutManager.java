@@ -275,6 +275,7 @@ public class CutManager {
         if (!cut.hasImage()) {
             return;
         }
+
         imageView.setImage(cut.currentImage());
         imageView.setFitHeight(cut.cutRectangle().height);
         imageView.setFitWidth(cut.cutRectangle().width);

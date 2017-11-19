@@ -120,6 +120,7 @@ public class Cut implements Serializable{
     }
 
     public Image currentImage() {
+        makeShowingImage();
         return ImageUtils.BufferedImageToFxImage(showingImage);
     }
 

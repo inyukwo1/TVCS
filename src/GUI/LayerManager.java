@@ -144,6 +144,7 @@ public class LayerManager {
         okButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
+                cutManager.resetImage();
                 dialog.close();
             }
         });
