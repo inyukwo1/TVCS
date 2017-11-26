@@ -141,4 +141,24 @@ public class ImageUtils {
 
         return mergedImage;
     }
+
+    public static int MixARGB (int background, int paint) {
+        int ba = (background >> 24) & 0xFF;
+        int br = (background >> 16) & 0xFF;
+        int bg = (background >> 8) & 0xFF;
+        int bb = (background >> 0) & 0xFF;
+
+        int pa = (paint >> 24) & 0xFF;
+        int pr = (paint >> 16) & 0xFF;
+        int pg = (paint >> 8) & 0xFF;
+        int pb = (paint >> 0) & 0xFF;
+
+        int ra = pa + (ba * (255 - pa) / 255);
+        int rr = (pr * pa / 255) + (br * ba * (255 - pa) / (255 * 255));
+        int rg = (pg * pa / 255) + (bg * ba * (255 - pa) / (255 * 255));
+        int rb = (pb * pa / 255) + (bb * ba * (255 - pa) / (255 * 255));
+
+        int result = (ra << 24) + (rr << 16) + (rg << 8) + (rb << 0);
+        return result;
+    }
 }

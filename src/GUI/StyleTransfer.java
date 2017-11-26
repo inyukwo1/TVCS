@@ -2,6 +2,7 @@ package GUI;
 
 import TVCS.Utils.ImageUtils;
 import TVCS.Utils.TVCSPoint;
+import javafx.collections.FXCollections;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -9,12 +10,10 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -45,6 +44,12 @@ public class StyleTransfer {
     static String OUT_PATH = NEURAL_HOME_PATH + "out";
     ArrayList<File> exampleFiles = new ArrayList<>();
     ArrayList<CheckBox> checkBoxes = new ArrayList<>();
+
+    ChoiceBox radiusChoice = new ChoiceBox(FXCollections.observableArrayList("5px", "10px", "15px", "20px"));
+    int[] radius = new int[]{5, 10, 15, 20};
+    int[] regionCheck; // Can get value from 0 to 255.
+    BufferedImage showigImage;
+    boolean checkRegioned = false;
 
     public StyleTransfer(LayerManager parentLayerManager) {
         this.parentLayerManager = parentLayerManager;
@@ -79,25 +84,89 @@ public class StyleTransfer {
                 CornerRadii.EMPTY, new BorderWidths(2), Insets.EMPTY))));
 
         handlingImage = parentLayerManager.getFirstSelectedImage();
+        if (handlingImage == null) {
+            //TODO do something
+        }
+        regionCheck = new int[handlingImage.getHeight() * handlingImage.getWidth()];
+        for (int i = 0 ; i < regionCheck.length; i++) {
+            regionCheck[i] = 0;
+        }
 
         imageView.setFitWidth(handlingImage.getWidth());
         imageView.setFitHeight(handlingImage.getHeight());
         newImage = ImageUtils.CopyBufferedImage(handlingImage);
-        if (handlingImage == null) {
-            //TODO do something
-        }
-        imageView.setImage(ImageUtils.BufferedImageToFxImage(handlingImage));
+        showigImage = ImageUtils.CopyBufferedImage(handlingImage);
+        imageView.setImage(ImageUtils.BufferedImageToFxImage(showigImage));
     }
 
     private void fillButtons(HBox buttons) {
         Button startButton = new Button("Start");
         setStartButton(startButton);
+        Button checkRegion = new Button("Check region");
+        setCheckRegionButton(checkRegion);
         Button saveButton = new Button("Save");
         setSaveButton(saveButton);
         Button okButton = new Button("Ok");
         setOkButton(okButton);
+
         buttons.setAlignment(Pos.CENTER);
-        buttons.getChildren().addAll(startButton, saveButton, okButton);
+        buttons.getChildren().addAll(startButton, checkRegion, saveButton, okButton, radiusChoice);
+    }
+
+    private void setCheckRegionButton(Button checkRegionButton) {
+        checkRegionButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                checkRegioned = true;
+                rootPane.setOnMouseDragged(new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent event) {
+                        String radius = radiusChoice.getValue().toString();
+                        int intrad = 5;
+                        switch (radius) {
+                            case  "5px":
+                                intrad = 5;
+                                break;
+                            case "10px":
+                                intrad = 10;
+                                break;
+                            case "15px":
+                                intrad = 15;
+                                break;
+                            case "20px":
+                                intrad = 20;
+                                break;
+                        }
+                        for (int yindex = (int) event.getY() - intrad; yindex < (int) event.getY() + intrad ; yindex++) {
+                            if (yindex < 0 || yindex >= (int) handlingImage.getHeight())
+                                continue;
+                            for (int xindex = (int) event.getX() - intrad; xindex < (int) event.getX() + intrad; xindex++) {
+                                if (xindex < 0 || xindex >= (int) handlingImage.getWidth())
+                                    continue;
+                                int relativeX = xindex - (int)event.getX();
+                                int relativeY = yindex - (int)event.getY();
+                                double relativeRad = Math.sqrt(relativeX * relativeX + relativeY * relativeY);
+                                if ((int) relativeRad > intrad)
+                                    continue;
+                                if ((int) relativeRad >= intrad / 2) {
+                                    regionCheck[yindex * handlingImage.getWidth() + xindex] =
+                                            Math.max(regionCheck[yindex * handlingImage.getWidth() + xindex], (int)(255 * ((intrad - relativeRad) / (intrad / 2))));
+                                    int addRGB = 0x0000FF00 + ((regionCheck[yindex * handlingImage.getWidth() + xindex] / 2) << 24);
+                                    int originRGB = showigImage.getRGB(xindex, yindex);
+                                    showigImage.setRGB(xindex, yindex, ImageUtils.MixARGB(originRGB, addRGB));
+                                } else {
+                                    regionCheck[yindex * handlingImage.getWidth() + xindex] = 255;
+                                    int addRGB = 0xFF00FF00;
+                                    int originRGB = showigImage.getRGB(xindex, yindex);
+                                    showigImage.setRGB(xindex, yindex, ImageUtils.MixARGB(originRGB, addRGB));
+                                }
+                            }
+                        }
+                        imageView.setImage(ImageUtils.BufferedImageToFxImage(showigImage));
+                    }
+                });
+            }
+        });
     }
 
     private void setStartButton(Button startButton) {
@@ -140,7 +209,6 @@ public class StyleTransfer {
             public void handle(ActionEvent event) {
                 for (int i = 0 ; i < checkBoxes.size() ; i++) {
                     if (checkBoxes.get(i).isSelected()) {
-
                         try {
                             FileOutputStream fileOutputStream = new FileOutputStream(IN_PATH + "\\temp.jpg");
                             ImageIO.write(handlingImage, "JPG", fileOutputStream);
@@ -171,12 +239,11 @@ public class StyleTransfer {
                             p.waitFor();
                             System.out.println("Done: " + String.valueOf((System.currentTimeMillis() - startTime) / 1000));
 
-
-
-
                             BufferedImage loadedimage = ImageIO.read(new File(OUT_PATH + "\\temp.jpg"));
                             newImage = new BufferedImage(loadedimage.getWidth(), loadedimage.getHeight(), BufferedImage.TYPE_INT_ARGB);
                             newImage.getGraphics().drawImage(loadedimage, 0, 0, null);
+                            if (checkRegioned)
+                                mixNewImage();
                             parentLayerManager.changeFirstSelectedImage(newImage);
                             imageView.setImage(ImageUtils.BufferedImageToFxImage(newImage));
                             selectDialog.close();
@@ -188,7 +255,18 @@ public class StyleTransfer {
                 }
             }
         });
+    }
 
+    private void mixNewImage() {
+        for (int y = 0 ; y < newImage.getHeight() ; y++) {
+            for (int x = 0 ; x < newImage.getWidth(); x++) {
+                int newargb = newImage.getRGB(x, y);
+                newargb &= 0x00FFFFFF;
+                newargb += (regionCheck[y * newImage.getWidth() + x] << 24);
+                int originargb = handlingImage.getRGB(x, y);
+                newImage.setRGB(x, y, ImageUtils.MixARGB(originargb, newargb));
+            }
+        }
     }
 
     private String getModelPath(File exampleFile) {
