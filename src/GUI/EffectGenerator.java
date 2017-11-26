@@ -36,7 +36,7 @@ public class EffectGenerator {
     ImageView imageView = new ImageView();
     Random randomGenerator = new Random();
 
-    double verticalScale = 0.1, horizontalScale = 0.1, shapeRad = 30;
+    double verticalScale = 0, horizontalScale = 0, shapeRad = 20;
     long timeGap = 250;
     long timeElapsed = 0;
     TVCSPoint pivot, first, second, third, fourth;
@@ -48,22 +48,13 @@ public class EffectGenerator {
         dialog.setTitle("Effect Generator");
     }
 
-    public Button makeEffectGeneratorButton() {
-        Button effectgeneratorButtton = new Button("EffectGenerator");
+    public void showThis() {
+        VBox container = new VBox();
+        fillLayerContainer(container);
+        Scene scene = new Scene(container, 600, 700);
 
-        effectgeneratorButtton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                VBox container = new VBox();
-                fillLayerContainer(container);
-                Scene scene = new Scene(container, 600, 700);
-
-                dialog.setScene(scene);
-                dialog.show();
-            }
-        });
-
-        return effectgeneratorButtton;
+        dialog.setScene(scene);
+        dialog.show();
     }
 
     private void fillLayerContainer(VBox container) {

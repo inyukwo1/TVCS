@@ -126,16 +126,29 @@ public class LayerManager {
     }
 
     private HBox makeButtons() {
+        LayerManager myLayerManager = this;
         HBox buttons = new HBox();
-
         Button okButton = new Button("OK");
         setOkButton(okButton);
         Button floodFillButton = new Button("Transparent");
         setfloodFillButton(floodFillButton);
-        Button effectGeneratorButton = (new EffectGenerator(this)).makeEffectGeneratorButton();
+        Button effectGeneratorButton = new Button("Effect Generator");
+        effectGeneratorButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                (new EffectGenerator(myLayerManager)).showThis();
+            }
+        });
+        Button styleTransferButton = new Button("Style Transfer");
+        styleTransferButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                (new StyleTransfer(myLayerManager)).showThis();
+            }
+        });
         Button saveButton = new Button("Save");
         setSaveButton(saveButton);
-        buttons.getChildren().addAll(okButton, floodFillButton, effectGeneratorButton, saveButton);
+        buttons.getChildren().addAll(okButton, floodFillButton, effectGeneratorButton, styleTransferButton, saveButton);
 
         return buttons;
     }

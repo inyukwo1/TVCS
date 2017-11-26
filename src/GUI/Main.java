@@ -3,17 +3,10 @@ package GUI;
 import TVCS.Toon.Toon;
 import TVCS.WorkSpace;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
-import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.opencv.core.Core;
-
-import java.io.IOException;
 
 public class Main extends Application {
 
