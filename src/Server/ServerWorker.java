@@ -1,11 +1,12 @@
 package Server;
 
-import Client.CommunicationType;
-import TVCS.Toon.Episode;
+        import Client.CommunicationType;
+        import TVCS.Toon.Episode;
+        import TVCS.Toon.ToonInfo;
 
-import java.io.*;
-import java.math.BigInteger;
-import java.net.Socket;
+        import java.io.*;
+        import java.math.BigInteger;
+        import java.net.Socket;
 
 /**
  * Created by ina on 2017-05-31.
@@ -37,6 +38,7 @@ public class ServerWorker implements Runnable {
             }
             System.out.println("Successfully done.");
         } catch (Exception e) {
+            e.printStackTrace();
             System.out.println("클라이언트를 강제로 종료했습니다. ");
         }finally{
             CloseBufferAndSocket();
@@ -70,6 +72,7 @@ public class ServerWorker implements Runnable {
         CommunicationType communicationType = getCommunicationType();
         switch (communicationType) {
             case DONE:
+                dataOutputStream.write(0);
                 return false;
             case AUTHORIZE:
                 authorization();
@@ -83,11 +86,14 @@ public class ServerWorker implements Runnable {
             case PUSH_EPISODE:
                 receiveAndSaveEpisode();
                 break;
+            case PULL_EPISODE:
+                pushEpisode();
+                break;
         }
         return true;
     }
 
-    private CommunicationType getCommunicationType() throws IOException{
+    private CommunicationType getCommunicationType() throws IOException {
         return CommunicationType.values()[dataInputStream.readInt()];
     }
 
@@ -102,6 +108,7 @@ public class ServerWorker implements Runnable {
 
     private void receiveToonId() throws IOException {
         serverToonManager.toonId = dataInputStream.readLong();
+        System.out.println("Toon ID: " + serverToonManager.toonId);
     }
 
     private void allocAndSendToonId() throws IOException {
@@ -113,7 +120,10 @@ public class ServerWorker implements Runnable {
     private void receiveAndSaveEpisode() throws IOException {
         try {
             ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+            ToonInfo toonInfo = (ToonInfo) objectInputStream.readObject();
+            dataOutputStream.writeInt(0);
             Episode receivedEpisode = (Episode) objectInputStream.readObject();
+            serverToonManager.saveToonInfo(toonInfo);
             serverToonManager.readyToSaveEpisode(receivedEpisode);
             serverToonManager.saveEpisodeInfo(receivedEpisode);
             int numCuts = dataInputStream.readInt();
@@ -135,7 +145,33 @@ public class ServerWorker implements Runnable {
     }
 
     private void receiveAndSaveImage(BigInteger cutId) throws IOException {
-        BigInteger imageId = new BigInteger(dataInputStream.readUTF());
+        String imageIdstring = dataInputStream.readUTF();
+        System.out.println(imageIdstring);
+        BigInteger imageId = new BigInteger(imageIdstring);
         serverToonManager.pullAndSaveImage(imageId, inputStream);
+        dataOutputStream.write(0);
+    }
+
+    private void pushEpisode() throws IOException {
+        try {
+            receiveToonId();
+            ObjectInputStream objectInputStream = new ObjectInputStream(dataInputStream);
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(dataOutputStream);
+            Episode receivedEpisode = (Episode) objectInputStream.readObject();
+            System.out.println("A");
+            objectOutputStream.writeInt(0);
+            objectOutputStream.flush();
+            System.out.println("for check: " + objectInputStream.readInt());
+            if (!serverToonManager.findEpisode(receivedEpisode)) {
+                objectOutputStream.writeBoolean(false);
+                objectOutputStream.flush();
+                return;
+            }
+            objectOutputStream.writeBoolean(true);
+            objectOutputStream.flush();
+            serverToonManager.pushCuts(objectInputStream, outputStream, objectOutputStream);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

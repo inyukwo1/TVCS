@@ -261,6 +261,11 @@ public class CutManager {
         });
     }
 
+    public void addImage(String imagepath) {
+        cut.AddImage(imagepath);
+        resetImage();
+    }
+
     private void setDefaultBorder() {
         cutContainer.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.DOTTED,
                 CornerRadii.EMPTY, new BorderWidths(BORDER_WIDTH), Insets.EMPTY)));

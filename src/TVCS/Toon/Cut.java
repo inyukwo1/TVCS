@@ -17,7 +17,7 @@ import java.util.ArrayList;
 /**
  * Created by ina on 2017-06-02.
  */
-public class Cut implements Serializable{
+public class Cut implements Serializable {
     public static int GRID_FIT_MIN_OFFSET = 0;
 
 
@@ -102,11 +102,11 @@ public class Cut implements Serializable{
         }
     }
 
-    public void Loadtransient(Toon parentToon, Episode parentScene) {
+    public void Loadtransient(Toon parentToon, Episode parentEpisode) {
         this.parentToon = parentToon;
-        this.parentEpisode = parentScene;
+        this.parentEpisode = parentEpisode;
         for(CutImage image: images) {
-            image.Loadtransient(parentToon, parentScene, this);
+            image.Loadtransient(parentToon, parentEpisode, this);
         }
         makeShowingImage();
     }
@@ -182,7 +182,7 @@ public class Cut implements Serializable{
                 parentEpisode.getGridSize() * (cutInfo.rightBottomGrid.second - cutInfo.leftTopGrid.second + 1) - 2 * myOffset;
     }
 
-    private void makeShowingImage() {
+    public void makeShowingImage() {
         ArrayList<BufferedImage> imagesToMerge = new ArrayList<>();
         for(CutImage cutImage: images) {
             if (cutImage.show()) {

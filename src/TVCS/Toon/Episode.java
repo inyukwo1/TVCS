@@ -28,10 +28,10 @@ public class Episode implements Serializable {
     public static int MIN_GRID = 10;
     public static int MAX_GRID = 500;
 
-    transient Toon parentToon;
+    public transient Toon parentToon;
 
     // This is saved with EpisodeTree
-    public transient EpisodeInfo episodeInfo;
+    public EpisodeInfo episodeInfo;
 
     public ArrayList<Cut> cuts;
 
@@ -138,6 +138,7 @@ public class Episode implements Serializable {
 
     private void Loadtransient(Toon parent_toon) {
         this.parentToon = parent_toon;
+        episodeInfo.setBackgroundColor();
         for(Cut cut : cuts) {
             cut.Loadtransient(parent_toon, this);
         }
@@ -152,12 +153,13 @@ public class Episode implements Serializable {
     }
 
     public boolean hasToSave() {
-        //TODO
+        if (episodeInfo.updated)
+            return true;
         return false;
     }
 
     public void setBackgroundColor(javafx.scene.paint.Color color) {
-        episodeInfo.backgroundColor = color;
+        episodeInfo.setBackgroundColor(color);
     }
 
     private BufferedImage MergeScene() {
@@ -182,5 +184,9 @@ public class Episode implements Serializable {
     public void updated() {
         episodeInfo.updated = true;
         parentToon.updated();
+    }
+
+    public long toonId() {
+        return parentToon.toonId();
     }
 }

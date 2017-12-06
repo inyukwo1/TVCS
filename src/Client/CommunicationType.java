@@ -8,5 +8,6 @@ public enum CommunicationType {
     ALLOCATION,
     AUTHORIZE,
     PUSH_EPISODE,
+    PULL_EPISODE,
     DONE
 }

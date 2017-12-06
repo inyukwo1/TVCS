@@ -88,15 +88,16 @@ public class RightPane {
         heightSlider.setValue(episode.getHeight());
     }
 
-    public void fillEpisodeRelatedPane(Button pushEpisode, Button addNewCut, Button extractPdf,
+    public void fillEpisodeRelatedPane(Button pushEpisode, Button pullEpisode, Button addNewCut, Button extractPdf,
                                        GridPane backgroudColorController, GridPane episodeSizeController,
                                        GridPane gridSizeController) {
         episodeRelatedPane.add(pushEpisode, 0, 0);
-        episodeRelatedPane.add(addNewCut, 0, 1);
-        episodeRelatedPane.add(extractPdf, 0, 2);
-        episodeRelatedPane.add(backgroudColorController, 0, 3);
-        episodeRelatedPane.add(episodeSizeController, 0, 4);
-        episodeRelatedPane.add(gridSizeController, 0, 5);
+        episodeRelatedPane.add(pullEpisode, 0, 1);
+        episodeRelatedPane.add(addNewCut, 0, 2);
+        episodeRelatedPane.add(extractPdf, 0, 3);
+        episodeRelatedPane.add(backgroudColorController, 0, 4);
+        episodeRelatedPane.add(episodeSizeController, 0, 5);
+        episodeRelatedPane.add(gridSizeController, 0, 6);
     }
 
     public void fillCutRelatedPane(Button showLayersButton, Button preserveRatioButton, GridPane fitToGridController) {

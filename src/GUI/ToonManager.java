@@ -165,7 +165,7 @@ public class ToonManager {
 
     private void whenFirstEpisodeMade() {
         // TODO 에피소드가 하나도 안남게 되었을 때 이거 삭제하는거 구현
-        rightPane.fillEpisodeRelatedPane(pushManager.getPushEpisodeButton(),
+        rightPane.fillEpisodeRelatedPane(pushManager.getPushEpisodeButton(), pushManager.getPullEpisodeButton(),
                 extractButton, addNewCutButton, backgroundColorController,
                 episodeSizeController, gridSizeController);
     }

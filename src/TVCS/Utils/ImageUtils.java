@@ -60,13 +60,13 @@ public class ImageUtils {
         int[] dataRGB = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
         int[] newDataRGB = new int[image.getWidth() * image.getHeight()];
         for (int i = 0; i < dataRGB.length; i++) {
-            if (((dataRGB[i] >> 24) & 0xFF) == 0) {
+            /*if (((dataRGB[i] >> 24) & 0xFF) == 0) {
                 newDataRGB[i] = 0xFF000000;
                 newDataRGB[i] += 255 << 8;
             }
-            else {
+            else {*/
                 newDataRGB[i] = dataRGB[i];
-            }
+            //}
         }
         BufferedImage newImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
         newImage.setRGB(0, 0, image.getWidth(), image.getHeight(), newDataRGB, 0, image.getWidth());
@@ -124,7 +124,7 @@ public class ImageUtils {
         BufferedImage mergedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         for (int j = 0 ; j < height ; j++) {
             for (int i = 0; i < width; i++) {
-                int rgb = 0;
+                /*int rgb = 0;
                 for (int index = images.size() - 1; index >= 0; index--) {
                     BufferedImage selectedImage = images.get(index);
                     if (i >= selectedImage.getWidth() || j >= selectedImage.getHeight())
@@ -134,6 +134,20 @@ public class ImageUtils {
                         rgb = thisRGB;
                         break;
                     }
+                }*/
+                int rgb = 0;
+                if (images.size() == 0) {
+                    mergedImage.setRGB(i, j, 0);
+                    continue;
+                }
+                if (i < images.get(0).getWidth() && j < images.get(0).getHeight())
+                    rgb = images.get(0).getRGB(i, j);
+
+                for (int index = 1; index < images.size(); index++) {
+                    int paint = 0;
+                    if (i < images.get(index).getWidth() && j < images.get(index).getHeight())
+                        paint = images.get(index).getRGB(i, j);
+                    rgb = MixARGB(rgb, paint);
                 }
                 mergedImage.setRGB(i, j, rgb);
             }
@@ -160,5 +174,17 @@ public class ImageUtils {
 
         int result = (ra << 24) + (rr << 16) + (rg << 8) + (rb << 0);
         return result;
+    }
+
+    public static boolean isImageDifferent(BufferedImage image1, BufferedImage image2) {
+        if (image1.getWidth() != image2.getWidth() || image1.getHeight() != image2.getHeight())
+            return true;
+        for (int j = 0 ; j < image1.getHeight(); j++) {
+            for (int i = 0 ; i < image1.getWidth(); i++) {
+                if (image1.getRGB(i, j) != image2.getRGB(i, j))
+                    return true;
+            }
+        }
+        return false;
     }
 }

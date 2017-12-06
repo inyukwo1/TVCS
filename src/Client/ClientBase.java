@@ -1,11 +1,11 @@
 package Client;
 
+import GUI.CutManager;
+import GUI.EpisodeManager;
 import GUI.GuiClientAuthorizer;
-import TVCS.Toon.Cut;
-import TVCS.Toon.CutImage;
-import TVCS.Toon.Episode;
-import TVCS.Toon.Toon;
+import TVCS.Toon.*;
 import TVCS.Utils.FileManager;
+import TVCS.WorkSpace;
 import javafx.scene.control.Alert;
 
 import java.io.*;
@@ -84,7 +84,10 @@ public class ClientBase {
     public void pushEpisode(Episode episode) {
         try {
             dataOutputStream.writeInt(CommunicationType.PUSH_EPISODE.ordinal());
-            pushEpisodeInfo(episode);
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+            pushToonInfo(episode.parentToon.toon_info, objectOutputStream);
+            dataInputStream.readInt();
+            pushEpisodeInfo(episode, objectOutputStream);
             dataOutputStream.writeInt(episode.numCuts());
             for (Cut cut : episode.cuts) {
                 pushCut(cut);
@@ -95,8 +98,11 @@ public class ClientBase {
         }
     }
 
-    private void pushEpisodeInfo(Episode episode) throws IOException {
-        ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+    private void pushToonInfo(ToonInfo toonInfo, ObjectOutputStream objectOutputStream) throws IOException {
+        objectOutputStream.writeObject(toonInfo);
+    }
+
+    private void pushEpisodeInfo(Episode episode, ObjectOutputStream objectOutputStream) throws IOException {
         objectOutputStream.writeObject(episode);
     }
 
@@ -110,12 +116,88 @@ public class ClientBase {
 
     private void pushImage(CutImage image) throws IOException {
         dataOutputStream.writeUTF(image.id().toString());
+        System.out.println(image.id().toString());
         FileManager.smallFilePush(image.cutImagePath(), outputStream);
+        dataInputStream.read();
+        System.out.println("Image pushed");
+    }
+
+    public void pullEpisode(EpisodeManager episodeManager) {
+        try {
+            dataOutputStream.writeInt(CommunicationType.PULL_EPISODE.ordinal());
+            dataOutputStream.writeLong(episodeManager.episode.toonId());
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(dataOutputStream);
+            ObjectInputStream objectInputStream = new ObjectInputStream(dataInputStream);
+            pushEpisodeInfo(episodeManager.episode, objectOutputStream);
+            System.out.println("A");
+            System.out.println("for check: " + objectInputStream.readInt());
+            objectOutputStream.writeInt(0);
+            objectOutputStream.flush();
+            if (!objectInputStream.readBoolean()) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("No related episode found");
+                alert.setContentText("No related episode found");
+                alert.showAndWait();
+                return;
+            }
+            int numCuts = objectInputStream.readInt();
+            System.out.println("Have to receive " + numCuts +" cuts");
+            for (int i = 0 ; i < numCuts; i++) {
+                receiveCut(episodeManager, objectInputStream, objectOutputStream);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            showDialogConnectingError();
+            closeConnection();
+        }
+    }
+
+    private void receiveCut(EpisodeManager episodeManager, ObjectInputStream objectInputStream, ObjectOutputStream objectOutputStream) throws IOException {
+        try {
+            Cut receiveCut = (Cut) objectInputStream.readObject();
+            Episode episode = WorkSpace.WorkingEpisode();
+            boolean cutExists = false;
+            Cut correspondingCut;
+            for (Cut cut: episode.cuts) {
+                if (cut.id() == receiveCut.id()) {
+                    cutExists = true;
+                    correspondingCut = cut;
+                    break;
+                }
+            }
+
+            if (cutExists) {
+                //TODO handle conflict
+                System.out.println("Not implemented Yet");
+            } else {
+                String cutPath = episode.sceneDirPath() + File.separator + receiveCut.id();
+                FileManager.MakeDirectory(cutPath);
+                System.out.println("Have to receive " + receiveCut.images.size() + " images");
+                for (CutImage image: receiveCut.images) {
+                    FileManager.smallFilePull(cutPath +  File.separator + image.id() + ".png", inputStream);
+                    objectOutputStream.writeInt(0);
+                    objectOutputStream.flush();
+                    System.out.println("for check: " + objectInputStream.readInt());
+                }
+                System.out.println("Images received");
+                receiveCut.Loadtransient(WorkSpace.WorkingToon(), episode);
+                episode.cuts.add(receiveCut);
+                receiveCut.makeShowingImage();
+
+                CutManager newCutManager = new CutManager(receiveCut, episodeManager);
+                episodeManager.cutManagers.add(newCutManager);
+                newCutManager.setUp();
+            }
+
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     public void clientEnd() {
         try {
             dataOutputStream.writeInt(CommunicationType.DONE.ordinal());
+            dataInputStream.read();
             closeConnection();
         } catch (IOException e) {
             e.printStackTrace();

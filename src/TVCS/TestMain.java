@@ -1,5 +1,6 @@
 package TVCS;
 
+import PhotoShopIntegrate.IntegrateServerOpen;
 import TVCS.Toon.Cut;
 import TVCS.Toon.Episode;
 import TVCS.Toon.Toon;
@@ -7,6 +8,8 @@ import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Scalar;
+
+import java.io.File;
 
 /**
  * Created by ina on 2017-06-04.
@@ -153,7 +156,7 @@ public class TestMain {
     }
     static{ System.loadLibrary(Core.NATIVE_LIBRARY_NAME); }
     public static void main (String [] args) throws Exception {
-        System.out.println("Welcome to OpenCV " + Core.VERSION);
+        /*System.out.println("Welcome to OpenCV " + Core.VERSION);
         Mat m = new Mat(5, 10, CvType.CV_8UC1, new Scalar(0));
         System.out.println("OpenCV Mat: " + m);
         Mat mr1 = m.row(1);
@@ -161,6 +164,10 @@ public class TestMain {
         Mat mc5 = m.col(5);
         mc5.setTo(new Scalar(5));
         System.out.println("OpenCV Mat data:\n" + m.dump());
-        //ToonTestPush();
+        //ToonTestPush();*/
+        //new IntegrateServerOpen(4000);
+        File file = new File("C:\\Users\\ina\\PhotoshopToTVCS\\-cut10.png");
+        if (file.exists())
+            System.out.println("zz");
     }
 }

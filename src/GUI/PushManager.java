@@ -21,12 +21,14 @@ public class PushManager {
     Button registerToonButton = new Button("Register toon");
     Button pushAllButton = new Button("Push All Changes");
     Button  pushEpisodeButton = new Button("Push This Episode");
+    Button pullEpisodeButton = new Button("Pull This Episode");
 
     public PushManager(Toon toon) {
         this.toon = toon;
         setRegisterButtonHandler();
         setPushAllButtonHandler();
         setPushEpisodeButtonHandler();
+        setPullEpisodeButtonHandler();
     }
 
     public Button getRegisterToonButton() {
@@ -41,13 +43,15 @@ public class PushManager {
         return pushEpisodeButton;
     }
 
+    public Button getPullEpisodeButton() { return pullEpisodeButton; }
+
     private void setRegisterButtonHandler() {
         registerToonButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 //TODO make below separate thread and make loading gui
                 if (registerToon()) {
-                    GuiUtils.showAlert("Succeed", "Register succeed!");
+                    GuiUtils.showAlert("Succeed", "Register succeed!" + toon.toonId());
                 }
             }
         });
@@ -104,6 +108,34 @@ public class PushManager {
         });
     }
 
+    private void setPullEpisodeButtonHandler() {
+        pullEpisodeButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                if (toon.toonId() == -1) {
+                    GuiUtils.showAlert("Register Toon First", "Register Toon First");
+                    return;
+                }
+                ToonManager workingToonManager = WorkSpace.mainApp.toonManager;
+                Episode selectedEpisode = workingToonManager.selectedEpisodeManager().episode;
+                if (selectedEpisode.hasToSave()) {
+                    if (SaveLoad.askWantToSave()){
+                        if (!toon.hasPath()) {
+                            SaveLoad.saveToonAction();
+                        }
+                        SaveLoad.saveEpisode(selectedEpisode);
+                    } else {
+                        return;
+                    }
+                }
+                //TODO make below separate thread and make loading gui
+                if (pullEpisode(workingToonManager.selectedEpisodeManager())) {
+                    GuiUtils.showAlert("Succeed", "Pull succeed!");
+                }
+            }
+        });
+    }
+
     private boolean pushAll() {
         ClientBase clientBase = new ClientBase(ServerResourceManager.SERVER_IP,
                 ServerResourceManager.SERVER_PORT, toon.toonId());
@@ -139,6 +171,23 @@ public class PushManager {
             return false;
         }
         clientBase.pushEpisode(episode);
+        clientBase.clientEnd();
+        return true;
+    }
+
+    private boolean pullEpisode(EpisodeManager episodeManager) {
+        ClientBase clientBase = new ClientBase(ServerResourceManager.SERVER_IP,
+                ServerResourceManager.SERVER_PORT, toon.toonId());
+        if (clientBase.disabled) {
+            return false;
+        }
+        if (!clientBase.authorizeWithGui(new GuiClientAuthorizer(clientBase))) {
+            return false;
+        }
+        if (clientBase.disabled) {
+            return false;
+        }
+        clientBase.pullEpisode(episodeManager);
         clientBase.clientEnd();
         return true;
     }

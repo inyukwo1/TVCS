@@ -87,7 +87,7 @@ public class FileManager {
             bufferedInputStream.close();
 
             DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
-            System.out.println("File size: "+sendBuffer.length);
+            System.out.println("File size: " + sendBuffer.length);
             dataOutputStream.writeInt(sendBuffer.length);
             BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(outputStream);
             bufferedOutputStream.write(sendBuffer, 0, sendBuffer.length);
@@ -108,7 +108,7 @@ public class FileManager {
         try{
             DataInputStream dataInputStream = new DataInputStream(inputStream);
             int fileSize = dataInputStream.readInt();
-            System.out.println("File size: " +fileSize);
+            System.out.println("File size: " + fileSize);
             byte[] receiveBuffer = new byte[fileSize];
 
             BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
@@ -119,6 +119,7 @@ public class FileManager {
                 sizeReadDone += sizeRead;
                 sizeReadLeft -= sizeRead;
             }
+            System.out.println("File received");
             return writeBufferToFile(path, receiveBuffer);
         } catch (IOException e) {
             e.printStackTrace();

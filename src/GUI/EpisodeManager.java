@@ -20,14 +20,14 @@ import java.util.ArrayList;
 public class EpisodeManager {
     ToonManager parentToonManager;
 
-    Episode episode;
+    public Episode episode;
     EpisodeTab tab;
     ScrollPane pane = new ScrollPane();
     Pane workPane = new Pane();
     ArrayList<Line> gridVerticalLines = new ArrayList<>();
     ArrayList<Line> gridHorizontalLines = new ArrayList<>();
 
-    ArrayList<CutManager> cutManagers = new ArrayList<>();
+    public ArrayList<CutManager> cutManagers = new ArrayList<>();
 
     boolean addingCut = false;
     CutManager selectedCut = null; // if null, nothing selected
@@ -242,6 +242,16 @@ public class EpisodeManager {
             gridHorizontalLines.add(horizontalLine);
             workPane.getChildren().add(horizontalLine);
         }
+    }
+
+    public CutManager addCut(int x1, int y1, int x2, int y2) {
+        cutManagers.add(new CutManager(
+                episode.AddNewCut(x1, y1, 0, 0), this));
+        CutManager cutManager = cutManagers.get(cutManagers.size() - 1);
+        cutManager.moveEndPoint(x2, y2);
+        cutManager.setUp();
+
+        return cutManager;
     }
 
     private EventHandler<MouseEvent> makePressEventHandler() {

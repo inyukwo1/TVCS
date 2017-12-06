@@ -97,6 +97,10 @@ class MenuManager {
         });
     }
 
+    private void pullFromServerSetOnAction() {
+
+    }
+
     private void afterToonLoad() {
         newScene.setDisable(false);
         saveToonAs.setDisable(false);

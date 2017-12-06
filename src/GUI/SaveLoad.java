@@ -54,6 +54,7 @@ public class SaveLoad {
         WorkSpace.mainApp.stopToon();
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Load Toon");
+        fileChooser.setInitialDirectory(new File("C:\\Users\\ina\\TVCSCLIENTHOME"));
         File toonInfoFile = fileChooser.showOpenDialog(WorkSpace.primaryStage);
         String toonDirPath = toonInfoFile.getParent();
         if (!WorkSpace.mainApp.loadToon(toonDirPath)) {

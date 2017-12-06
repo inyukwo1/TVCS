@@ -13,7 +13,8 @@ public class EpisodeInfo extends ObjectMetaInfo {
     public String name;
     public int width, height;
     public int gridSize;
-    public Color backgroundColor;
+    transient public Color backgroundColor;
+    private double backgroundRed, backgroundGreen, backgroundBlue, backgroundOpacity;
 
     public Image thumbnail; //TODO 저장, 로드, push, pull 등
     public Pair<Integer, Integer> episodeTreePaneLocation;
@@ -25,5 +26,21 @@ public class EpisodeInfo extends ObjectMetaInfo {
         this.height = height;
         this.gridSize = Episode.DEFAULT_GRID;
         this.backgroundColor = Color.WHITE;
+        this.backgroundRed = this.backgroundColor.getRed();
+        this.backgroundGreen = this.backgroundColor.getGreen();
+        this.backgroundBlue = this.backgroundColor.getBlue();
+        this.backgroundOpacity = this.backgroundColor.getOpacity();
+    }
+
+    public void setBackgroundColor() {
+        this.backgroundColor = new Color(this.backgroundRed, this.backgroundGreen, this.backgroundBlue, this.backgroundOpacity);
+    }
+
+    public void setBackgroundColor(Color color) {
+        this.backgroundColor = color;
+        this.backgroundRed = this.backgroundColor.getRed();
+        this.backgroundGreen = this.backgroundColor.getGreen();
+        this.backgroundBlue = this.backgroundColor.getBlue();
+        this.backgroundOpacity = this.backgroundColor.getOpacity();
     }
 }
